@@ -3,12 +3,26 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
+    "node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
     extend: {
       colors: {
-        dun: "#D3BF9E",
+        dun: "#C19A6B",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
+        marquee2: {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0%)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 45s linear infinite",
+        marquee2: "marquee2 45s linear infinite",
       },
     },
   },
