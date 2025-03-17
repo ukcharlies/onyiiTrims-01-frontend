@@ -147,7 +147,7 @@ const NavbarComponent = () => {
                     <Link
                       key={item.to}
                       to={item.to}
-                      className={`font-medium whitespace-nowrap transition-colors duration-200 ${
+                      className={`font-lora font-medium tracking-wide whitespace-nowrap transition-colors duration-200 ${
                         isScrolled
                           ? "text-gray-700 dark:text-gray-200 hover:text-dun"
                           : "text-white hover:text-white/80"
@@ -174,7 +174,7 @@ const NavbarComponent = () => {
               <div className="w-1/3 flex items-center justify-end gap-6 md:gap-8">
                 <Link
                   to="/login"
-                  className={`hidden lg:block text-base font-medium transition-colors duration-200 ${
+                  className={`hidden lg:block font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
                     isScrolled
                       ? "text-gray-700 dark:text-gray-200 hover:text-dun"
                       : "text-white hover:text-white/80"

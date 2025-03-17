@@ -8,7 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        dun: "#C19A6B",
+        dun: "#C4A484",
+      },
+      fontFamily: {
+        playfair: ['"Playfair Display"', "serif"],
+        lora: ["Lora", "serif"],
       },
       keyframes: {
         marquee: {
