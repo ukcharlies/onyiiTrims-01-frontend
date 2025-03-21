@@ -1,6 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import ProductSlider from "../components/ProductSlider";
+import ProductGrid from "../components/ProductGrid";
+import TestimonialCarousel from "../components/TestimonialCarousel";
 
 const Home = () => {
+  const [hotBuyProducts, setHotBuyProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState({
+    hotBuy: true,
+    featured: true,
+  });
+  const [error, setError] = useState({
+    hotBuy: null,
+    featured: null,
+  });
+
+  useEffect(() => {
+    const fetchHotBuyProducts = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/products/hot-buy"
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch hot buy products");
+        }
+        const data = await response.json();
+        setHotBuyProducts(data);
+        setError((prev) => ({ ...prev, hotBuy: null }));
+      } catch (error) {
+        console.error("Error fetching hot buy products:", error);
+        setError((prev) => ({
+          ...prev,
+          hotBuy: "Unable to load hot buy products. Please try again later.",
+        }));
+        setHotBuyProducts([]);
+      } finally {
+        setLoading((prev) => ({ ...prev, hotBuy: false }));
+      }
+    };
+
+    const fetchFeaturedProducts = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/products/featured"
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch featured products");
+        }
+        const data = await response.json();
+        setFeaturedProducts(data);
+        setError((prev) => ({ ...prev, featured: null }));
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+        setError((prev) => ({
+          ...prev,
+          featured: "Unable to load featured products. Please try again later.",
+        }));
+        setFeaturedProducts([]);
+      } finally {
+        setLoading((prev) => ({ ...prev, featured: false }));
+      }
+    };
+
+    fetchHotBuyProducts();
+    fetchFeaturedProducts();
+  }, []);
+
   return (
     <main>
       {/* Hero Video Section */}
@@ -32,13 +97,263 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Rest of the content */}
+      {/* Hot Buy Products Section */}
       <div className="relative bg-white">
-        <div className="container mx-auto px-4 py-16">
-          <h2 className="font-playfair text-3xl font-bold mb-8">
-            Featured Collections
-          </h2>
-          {/* Add your other content sections here */}
+        <div className="container mx-auto px-4 py-10">
+          {loading.hotBuy ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error.hotBuy ? (
+            <div className="text-center py-10">
+              <p className="text-red-500">{error.hotBuy}</p>
+              <p className="mt-2">
+                Check if your backend server is running correctly.
+              </p>
+            </div>
+          ) : hotBuyProducts.length === 0 ? (
+            <div className="text-center py-10">
+              <h2 className="font-playfair text-3xl font-bold mb-4">
+                Hot Buys
+              </h2>
+
+              <p>No hot buy products available at the moment.</p>
+            </div>
+          ) : (
+            <div>
+              <ProductSlider
+                products={hotBuyProducts}
+                title="Hot Buys"
+                description="Discover premium embellishments and fashion essentials handpicked for designers, tailors, and creatives. Explore our hottest buys collection."
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Marquee Text Section */}
+      <div className="bg-white py-12 overflow-hidden border-y-2 border-dun">
+        <div className="relative flex items-center h-20">
+          <div className="animate-marquee whitespace-nowrap absolute left-0">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              ELEVATED CRAFTSMANSHIP
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              EXQUISITE TRIM DETAILS
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              ELEVATED CRAFTSMANSHIP
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              EXQUISITE TRIM DETAILS
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+          </div>
+          <div className="animate-marquee2 whitespace-nowrap absolute left-0">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              ELEVATED CRAFTSMANSHIP
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              EXQUISITE TRIM DETAILS
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              ELEVATED CRAFTSMANSHIP
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+              EXQUISITE TRIM DETAILS
+            </span>
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+              ★
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Promotional Features Section */}
+      <div className="bg-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-playfair text-3xl font-bold mb-4">
+              Why Choose Onyi Trims
+            </h2>
+            <div className="w-24 h-1 bg-dun mx-auto mb-4"></div>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              We provide premium quality trims and exceptional service to
+              elevate your creative projects
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-8 h-8 text-dun"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Premium Quality</h3>
+              <p className="text-gray-600">
+                Carefully curated collection of high-quality trims and
+                embellishments sourced from the finest materials.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-8 h-8 text-dun"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Fast Shipping</h3>
+              <p className="text-gray-600">
+                Quick and reliable delivery services to ensure your creative
+                projects stay on schedule.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-8 h-8 text-dun"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Expert Support</h3>
+              <p className="text-gray-600">
+                Our team of experts is always ready to assist you in finding the
+                perfect trims for your projects.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Collections Section */}
+      <div className="relative bg-gray-50">
+        <div className="container mx-auto px-4 py-10">
+          {loading.featured ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error.featured ? (
+            <div className="text-center py-10">
+              <p className="text-red-500">{error.featured}</p>
+              <p className="mt-2">
+                Check if your backend server is running correctly.
+              </p>
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="text-center py-10">
+              <h2 className="font-playfair text-3xl font-bold mb-4">
+                Featured Collections
+              </h2>
+              <p>No featured products available at the moment.</p>
+            </div>
+          ) : (
+            <ProductGrid
+              products={featuredProducts}
+              title="Featured Collections"
+              description="Explore our newest additions crafted with meticulous attention to detail. These premium trims and embellishments are selected to elevate your creative projects."
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Customer Reviews Section */}
+      <div className="relative bg-white border-t border-gray-100">
+        <div className="container mx-auto">
+          <TestimonialCarousel />
+        </div>
+      </div>
+
+      {/* Instagram Gallery Section */}
+
+      {/* Newsletter Subscription Section */}
+      <div className="py-20 bg-dun">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="font-playfair text-3xl font-bold mb-4 text-white">
+              Stay Inspired
+            </h2>
+            <p className="text-white/80 mb-8 text-lg">
+              Subscribe to our newsletter and be the first to know about new
+              collections, special offers, and creative inspiration.
+            </p>
+
+            <form className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="flex-grow px-6 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50"
+                required
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-white text-dun font-medium rounded-md hover:bg-gray-100 transition-colors duration-300"
+              >
+                Subscribe
+              </button>
+            </form>
+
+            <p className="text-white/60 mt-4 text-sm">
+              By subscribing, you agree to our Privacy Policy and consent to
+              receive updates from our company.
+            </p>
+          </div>
         </div>
       </div>
     </main>

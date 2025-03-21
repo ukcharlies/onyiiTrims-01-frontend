@@ -11,6 +11,8 @@ import {
 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useCart } from "../context/CartContext";
+import CartDrawer from "./CartDrawer";
 
 const NavbarComponent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,6 +20,12 @@ const NavbarComponent = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const { cartItems } = useCart();
+
+  const cartItemCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const menuItems = [
     { to: "/", text: "Home", icon: HiHome },
@@ -207,9 +215,11 @@ const NavbarComponent = () => {
                   >
                     <HiShoppingCart className="h-7 w-7 md:h-8 md:w-8" />
                   </button>
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-dun rounded-full border-2 border-white dark:border-gray-900">
-                    0
-                  </span>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-dun rounded-full border-2 border-white dark:border-gray-900">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -277,55 +287,7 @@ const NavbarComponent = () => {
         )}
 
         {/* Cart Drawer */}
-        <div
-          className={`fixed inset-y-0 right-0 w-full md:w-[60%] bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
-            isCartOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex flex-col h-full">
-            {/* Cart Header */}
-            <div className="flex items-center justify-between p-6 border-b dark:border-gray-700/50">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                Cart
-              </h2>
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
-                aria-label="Close cart"
-              >
-                <HiX className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-              </button>
-            </div>
-
-            {/* Empty Cart State */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-6 mb-6">
-                <HiOutlineShoppingBag className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-              </div>
-              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-3">
-                Your cart is empty
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
-                Looks like you haven't added any items to your cart yet
-              </p>
-              <Link
-                to="/shop"
-                onClick={() => setIsCartOpen(false)}
-                className="inline-flex items-center px-6 py-3 bg-dun hover:bg-dun/90 text-white font-medium rounded-lg transition-colors duration-200"
-              >
-                Start Shopping
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Overlay for Cart Drawer */}
-        {isCartOpen && (
-          <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"
-            onClick={() => setIsCartOpen(false)}
-          ></div>
-        )}
+        <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
         {/* Mobile Menu */}
         <div

@@ -141,6 +141,30 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Contact Section */}
+          <div className="border-b md:border-none border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 font-playfair mb-6">
+              Contact Us
+            </h3>
+            <div className="space-y-3">
+              <p className="text-gray-600">
+                <strong>Email:</strong>{" "}
+                <a href="mailto:info@onyitrims.com" className="hover:text-dun">
+                  info@onyitrims.com
+                </a>
+              </p>
+              <p className="text-gray-600">
+                <strong>Phone:</strong>{" "}
+                <a href="tel:+2348012345678" className="hover:text-dun">
+                  +234 801 234 5678
+                </a>
+              </p>
+              <p className="text-gray-600">
+                <strong>Address:</strong> 123 Fashion Street, Lagos, Nigeria
+              </p>
+            </div>
+          </div>
+
           {/* Newsletter Section */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
