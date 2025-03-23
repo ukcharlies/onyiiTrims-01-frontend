@@ -6,18 +6,26 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (product) => {
+    // Ensure price is always stored as a number
+    const productWithNumberPrice = {
+      ...product,
+      price: Number(product.price),
+    };
+
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
+      const existingItem = prevItems.find(
+        (item) => item.id === productWithNumberPrice.id
+      );
 
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === product.id
+          item.id === productWithNumberPrice.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
 
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...productWithNumberPrice, quantity: 1 }];
     });
   };
 
@@ -41,7 +49,7 @@ export const CartProvider = ({ children }) => {
 
   const getCartTotal = () => {
     return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + Number(item.price) * item.quantity,
       0
     );
   };

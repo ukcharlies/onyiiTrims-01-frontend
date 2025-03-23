@@ -1,17 +1,21 @@
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useGlobal } from "../context/GlobalContext";
+import { useCart } from "../context/CartContext";
 import {
-  HiSearch,
-  HiShoppingCart,
-  HiUser,
-  HiHome,
-  HiX,
   HiOutlineShoppingBag,
+  HiOutlineMenu,
+  HiX,
+  HiSearch,
+  HiUser,
+  HiLogout,
+  HiOutlineCollection,
+  HiShoppingBag,
+  HiHome,
   HiCheckCircle,
   HiSparkles,
   HiTruck,
 } from "react-icons/hi";
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useCart } from "../context/CartContext";
 import CartDrawer from "./CartDrawer";
 
 const NavbarComponent = () => {
@@ -21,6 +25,7 @@ const NavbarComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useCart();
+  const { isAuthenticated, user, logout } = useGlobal();
 
   const cartItemCount = cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -59,6 +64,11 @@ const NavbarComponent = () => {
     setIsMenuOpen(false);
     setIsSearchOpen(false);
     setIsCartOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsMenuOpen(false);
   };
 
   return (
@@ -180,16 +190,43 @@ const NavbarComponent = () => {
 
               {/* Right Section */}
               <div className="w-1/3 flex items-center justify-end gap-6 md:gap-8">
-                <Link
-                  to="/login"
-                  className={`hidden lg:block font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
-                    isScrolled
-                      ? "text-gray-700 dark:text-gray-200 hover:text-dun"
-                      : "text-white hover:text-white/80"
-                  }`}
-                >
-                  Login
-                </Link>
+                {isAuthenticated ? (
+                  <div className="hidden lg:flex items-center gap-4">
+                    <Link
+                      to="/dashboard"
+                      className={`font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
+                        isScrolled
+                          ? "text-gray-700 dark:text-gray-200 hover:text-dun"
+                          : "text-white hover:text-white/80"
+                      }`}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/profile"
+                      className={`flex items-center gap-1 font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
+                        isScrolled
+                          ? "text-gray-700 dark:text-gray-200 hover:text-dun"
+                          : "text-white hover:text-white/80"
+                      }`}
+                    >
+                      <HiUser className="h-5 w-5" />
+                      <span>{user?.firstName || "Profile"}</span>
+                    </Link>
+                  </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className={`hidden lg:flex items-center px-4 py-2 rounded ${
+                      isScrolled
+                        ? "bg-dun text-white hover:bg-dun/90"
+                        : "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm"
+                    } transition-colors duration-200`}
+                  >
+                    <HiUser className="h-5 w-5 mr-2" />
+                    <span className="font-medium">Login</span>
+                  </Link>
+                )}
 
                 <button
                   onClick={() => setIsSearchOpen(true)}
@@ -206,20 +243,20 @@ const NavbarComponent = () => {
                 <div className="relative inline-flex items-center">
                   <button
                     onClick={() => setIsCartOpen(true)}
-                    className={`p-2 transition-colors duration-200 ${
+                    className={`relative p-2 transition-colors duration-200 ${
                       isScrolled
                         ? "text-gray-700 hover:text-dun"
                         : "text-white hover:text-white/80"
                     }`}
                     aria-label="Open cart"
                   >
-                    <HiShoppingCart className="h-7 w-7 md:h-8 md:w-8" />
+                    <HiOutlineShoppingBag className="h-7 w-7 md:h-8 md:w-8" />
+                    {cartItems.length > 0 && (
+                      <span className="absolute top-0 right-0 bg-dun text-white text-xs h-5 w-5 flex items-center justify-center rounded-full">
+                        {cartItems.length}
+                      </span>
+                    )}
                   </button>
-                  {cartItemCount > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-dun rounded-full border-2 border-white dark:border-gray-900">
-                      {cartItemCount}
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
@@ -340,7 +377,7 @@ const NavbarComponent = () => {
                 <HiSearch className="absolute left-4 top-5 h-6 w-6 text-gray-500 dark:text-gray-400" />
               </div>
 
-              {/* Login Link */}
+              {/* Login/Register Links in Mobile Menu */}
               <div
                 className={`pt-4 border-t border-gray-200 dark:border-gray-700 transform transition-all duration-300 delay-600 ${
                   isMenuOpen
@@ -348,14 +385,45 @@ const NavbarComponent = () => {
                     : "translate-x-8 opacity-0"
                 }`}
               >
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-400 hover:text-dun transition-colors duration-200"
-                >
-                  <HiUser className="h-5 w-5" />
-                  <span>Sign in to your account</span>
-                </Link>
+                {isAuthenticated ? (
+                  <div className="flex flex-col space-y-4">
+                    <div className="text-gray-600 mb-2">
+                      Welcome, {user?.firstName || "User"}!
+                    </div>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-400 hover:text-dun transition-colors duration-200"
+                    >
+                      <HiOutlineShoppingBag className="h-5 w-5" />
+                      <span>Dashboard</span>
+                    </Link>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-400 hover:text-dun transition-colors duration-200"
+                    >
+                      <HiUser className="h-5 w-5" />
+                      <span>My Profile</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-400 hover:text-dun transition-colors duration-200"
+                    >
+                      <HiLogout className="h-5 w-5" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center space-x-3 text-base text-gray-600 dark:text-gray-400 hover:text-dun transition-colors duration-200"
+                  >
+                    <HiUser className="h-5 w-5" />
+                    <span>Login</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

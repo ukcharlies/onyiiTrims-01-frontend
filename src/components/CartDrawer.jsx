@@ -65,10 +65,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
                       <p className="text-gray-600">
-                        $
-                        {typeof item.price === "number"
-                          ? item.price.toFixed(2)
-                          : "Invalid Price"}
+                        ${Number(item.price).toFixed(2)}
                       </p>
                       <div className="flex items-center space-x-2 mt-2">
                         <button
@@ -113,9 +110,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   ${getCartTotal().toFixed(2)}
                 </span>
               </div>
-              <button className="w-full bg-dun text-white py-2 rounded-lg hover:bg-dun/90">
+              <Link
+                to="/checkout"
+                onClick={onClose}
+                className="block w-full text-center bg-dun text-white py-2 rounded-lg hover:bg-dun/90"
+              >
                 Checkout
-              </button>
+              </Link>
             </div>
           )}
         </div>
