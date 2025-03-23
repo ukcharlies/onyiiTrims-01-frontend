@@ -8,6 +8,32 @@ export const GlobalProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Add dark mode state using localStorage for persistence
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("darkMode") === "true"
+  );
+
+  // Toggle dark mode function
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("darkMode", newMode);
+
+    // Apply or remove dark class to html element
+    if (newMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  // Initialize dark mode on component mount
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
   useEffect(() => {
     // Check for authentication using cookies
     const checkAuth = async () => {
@@ -163,19 +189,21 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  const contextValue = {
+    user,
+    isAuthenticated,
+    loading,
+    register,
+    login,
+    logout,
+    updateUser,
+    apiUrl: API_URL,
+    darkMode,
+    toggleDarkMode,
+  };
+
   return (
-    <GlobalContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        loading,
-        login,
-        logout,
-        register,
-        updateUser,
-        apiUrl: API_URL,
-      }}
-    >
+    <GlobalContext.Provider value={contextValue}>
       {children}
     </GlobalContext.Provider>
   );

@@ -16,6 +16,12 @@ import {
 } from "react-icons/fa";
 
 const Contact = () => {
+  // Handler for image error
+  const handleImageError = (e) => {
+    // Use a local fallback image instead of an external placeholder
+    e.target.src = "/images/placeholder-image.jpg";
+  };
+
   return (
     <div className="pt-36 md:pt-40">
       {/* Hero Section */}
@@ -183,15 +189,12 @@ const Contact = () => {
 
             {/* Right Column - Map and Image */}
             <div>
-              <div className="rounded-lg overflow-hidden shadow-lg mb-8">
+              <div className="rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/images/storefront.jpg"
-                  alt="Onyi Trims Storefront"
+                  src="/images/store-location.jpg"
+                  alt="Our Store"
                   className="w-full h-auto"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/800x500?text=Our+Store";
-                  }}
+                  onError={handleImageError}
                 />
               </div>
 

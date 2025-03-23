@@ -136,7 +136,7 @@ const NavbarComponent = () => {
         <nav
           className={`w-full transition-all duration-300 ${
             isScrolled
-              ? "bg-white/95 backdrop-blur-md shadow-md dark:bg-gray-900/95"
+              ? "bg-white/95 backdrop-blur-md shadow-md dark:bg-gray-900/95 dark:text-white"
               : "bg-transparent border-b border-white/20"
           }`}
         >
@@ -187,7 +187,7 @@ const NavbarComponent = () => {
                       to={item.to}
                       className={`font-lora font-medium tracking-wide whitespace-nowrap transition-colors duration-200 ${
                         isScrolled
-                          ? "text-gray-700 dark:text-gray-200 hover:text-dun"
+                          ? "text-gray-700 dark:text-gray-200 hover:text-dun dark:hover:text-dun"
                           : "text-white hover:text-white/80"
                       }`}
                     >
@@ -216,7 +216,7 @@ const NavbarComponent = () => {
                       to="/dashboard"
                       className={`font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
                         isScrolled
-                          ? "text-gray-700 dark:text-gray-200 hover:text-dun"
+                          ? "text-gray-700 dark:text-gray-200 hover:text-dun dark:hover:text-dun"
                           : "text-white hover:text-white/80"
                       }`}
                     >
@@ -226,7 +226,7 @@ const NavbarComponent = () => {
                       to="/profile"
                       className={`flex items-center gap-1 font-lora tracking-wide text-base font-medium transition-colors duration-200 ${
                         isScrolled
-                          ? "text-gray-700 dark:text-gray-200 hover:text-dun"
+                          ? "text-gray-700 dark:text-gray-200 hover:text-dun dark:hover:text-dun"
                           : "text-white hover:text-white/80"
                       }`}
                     >

@@ -79,7 +79,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         <div className="flex items-center justify-between">
           <div className="mt-1">
             <p className="text-lg font-medium text-gray-900">
-              ₦{price.toFixed(2)}
+              {price ? formatPrice(price) : "₦0.00"}
             </p>
           </div>
         </div>

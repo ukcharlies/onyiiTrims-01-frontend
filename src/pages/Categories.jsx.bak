@@ -334,7 +334,7 @@ const Categories = () => {
                   className={`whitespace-nowrap py-2 px-4 font-medium rounded-md transition-colors ${
                     category.id === categoryId
                       ? "bg-dun text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                      : "text-gray-700 hover:bg-gray-200"
                   }`}
                   onClick={() => handleCategoryChange(category.id)}
                 >
@@ -372,7 +372,7 @@ const Categories = () => {
               <h1 className="text-3xl font-bold font-lora mb-3">
                 {currentCategory.name}
               </h1>
-              <p className="text-gray-700 dark:text-gray-300">{currentCategory.description}</p>
+              <p className="text-gray-700">{currentCategory.description}</p>
             </div>
 
             {/* Content Grid */}
