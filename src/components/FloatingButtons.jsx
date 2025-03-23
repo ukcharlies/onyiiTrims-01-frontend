@@ -36,7 +36,11 @@ const FloatingButtons = () => {
     <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-3">
       <button
         onClick={toggleDarkMode}
-        className="p-3 bg-dun text-white rounded-full shadow-lg hover:bg-dun/90 transition-all duration-300"
+        className={`p-3 ${
+          darkMode ? "bg-[#607466]" : "bg-dun"
+        } text-white rounded-full shadow-lg ${
+          darkMode ? "hover:bg-[#607466]/90" : "hover:bg-dun/90"
+        } transition-all duration-300`}
         aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
         {darkMode ? (
@@ -47,7 +51,11 @@ const FloatingButtons = () => {
       </button>
       <button
         onClick={scrollToTop}
-        className="p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 transition-all duration-300"
+        className={`p-3 ${
+          darkMode ? "bg-[#343E3D]" : "bg-gray-800"
+        } text-white rounded-full shadow-lg ${
+          darkMode ? "hover:bg-gray-700" : "hover:bg-gray-700"
+        } transition-all duration-300`}
         aria-label="Scroll to top"
       >
         <HiArrowUp className="w-6 h-6" />

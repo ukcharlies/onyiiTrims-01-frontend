@@ -14,7 +14,7 @@ import { useCart } from "../context/CartContext";
 
 const ProductDetails = () => {
   const { productId } = useParams();
-  const { apiUrl } = useGlobal();
+  const { apiUrl, darkMode } = useGlobal();
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -31,6 +31,11 @@ const ProductDetails = () => {
   const formatPrice = (value) => {
     return `₦${new Intl.NumberFormat("en-NG").format(value)}`;
   };
+
+  // Related Products card styling
+  const cardBgClass = darkMode ? "bg-[#343E3D]" : "bg-white";
+  const textClass = darkMode ? "text-white" : "text-gray-800";
+  const buttonBgClass = darkMode ? "bg-[#607466]" : "bg-dun";
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -311,25 +316,31 @@ const ProductDetails = () => {
 
             {/* Price */}
             <div className="mt-4">
-              <span className="text-2xl font-bold text-gray-900">
-                ₦{product.price.toFixed(2)}
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                {product.price ? formatPrice(product.price) : "₦0.00"}
               </span>
             </div>
 
             <div className="mb-8">
-              <p className="text-gray-700 mb-4">{product.description}</p>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                {product.description}
+              </p>
 
               {/* Specifications */}
               {product.specifications && product.specifications.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-3">Specifications</h3>
+                  <h3 className="text-lg font-medium mb-3 dark:text-white">
+                    Specifications
+                  </h3>
                   <ul className="space-y-2">
                     {product.specifications.map((spec, index) => (
                       <li key={index} className="flex">
-                        <span className="font-medium w-24 text-gray-700">
+                        <span className="font-medium w-24 text-gray-700 dark:text-gray-300">
                           {spec.name}:
                         </span>
-                        <span className="text-gray-600">{spec.value}</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {spec.value}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -343,8 +354,8 @@ const ProductDetails = () => {
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-sm ${
                     product.stock > 0
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+                      : "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
                   }`}
                 >
                   {product.stock > 0
@@ -357,17 +368,19 @@ const ProductDetails = () => {
             {/* Add to cart */}
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-4">
-                <div className="flex items-center border border-gray-300 rounded-md">
+                <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md">
                   <button
-                    className="px-3 py-2 text-gray-500 hover:text-gray-700"
+                    className="px-3 py-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
                     onClick={() => handleQuantityChange(-1)}
                     disabled={quantity <= 1}
                   >
                     <HiOutlineMinus className="h-4 w-4" />
                   </button>
-                  <span className="px-3 py-2 w-12 text-center">{quantity}</span>
+                  <span className="px-3 py-2 w-12 text-center dark:text-white">
+                    {quantity}
+                  </span>
                   <button
-                    className="px-3 py-2 text-gray-500 hover:text-gray-700"
+                    className="px-3 py-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white"
                     onClick={() => handleQuantityChange(1)}
                   >
                     <HiOutlinePlus className="h-4 w-4" />
@@ -375,7 +388,9 @@ const ProductDetails = () => {
                 </div>
 
                 <button
-                  className={`flex-1 flex items-center justify-center bg-dun text-white py-3 px-6 rounded-md hover:bg-dun/90 transition-colors ${
+                  className={`flex-1 flex items-center justify-center ${
+                    darkMode ? "bg-[#607466]" : "bg-dun"
+                  } text-white py-3 px-6 rounded-md hover:opacity-90 transition-colors ${
                     product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   onClick={handleAddToCart}
@@ -385,7 +400,7 @@ const ProductDetails = () => {
                   Add to Cart
                 </button>
 
-                <button className="p-3 border border-gray-300 rounded-md text-gray-500 hover:text-dun hover:border-dun transition-colors">
+                <button className="p-3 border border-gray-300 dark:border-gray-600 rounded-md text-gray-500 dark:text-gray-300 hover:text-dun dark:hover:text-[#607466] hover:border-dun dark:hover:border-[#607466] transition-colors">
                   <HiOutlineHeart className="h-5 w-5" />
                 </button>
               </div>
@@ -396,14 +411,18 @@ const ProductDetails = () => {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold font-lora mb-6">
+            <h2
+              className={`text-2xl font-bold font-lora mb-6 ${
+                darkMode ? "text-white" : ""
+              }`}
+            >
               Related Products
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {relatedProducts.map((related) => (
                 <div
                   key={related.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform cursor-pointer hover:-translate-y-1 hover:shadow-lg"
+                  className={`${cardBgClass} rounded-lg shadow-md overflow-hidden transition-transform cursor-pointer hover:-translate-y-1 hover:shadow-lg`}
                   onClick={() => {
                     navigate(`/products/${related.id}`);
                   }}
@@ -423,10 +442,14 @@ const ProductDetails = () => {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-medium text-gray-800 mb-1 truncate">
+                    <h3 className={`font-medium ${textClass} mb-1 truncate`}>
                       {related.name}
                     </h3>
-                    <span className="text-dun font-bold">
+                    <span
+                      className={`${
+                        darkMode ? "text-[#607466]" : "text-dun"
+                      } font-bold`}
+                    >
                       {formatPrice(related.price)}
                     </span>
                   </div>

@@ -1,15 +1,22 @@
 import React from "react";
 import ProductCard from "./ProductCard";
 import { Link } from "react-router-dom";
+import { useGlobal } from "../context/GlobalContext";
 
 const ProductGrid = ({ products, title, description }) => {
+  const { darkMode } = useGlobal();
+
   return (
     <div className="relative">
       <div className="text-center mb-8">
-        <h2 className="font-playfair text-3xl font-bold mb-4">{title}</h2>
-        <div className=" w-32 h-1 bg-dun mx-auto mb-4"></div>
+        <h2 className="font-playfair text-3xl font-bold mb-4 dark:text-white">
+          {title}
+        </h2>
+        <div className="w-32 h-1 bg-dun dark:bg-[#607466] mx-auto mb-4"></div>
         {description && (
-          <p className="text-gray-600 max-w-3xl mx-auto">{description}</p>
+          <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            {description}
+          </p>
         )}
       </div>
 
@@ -19,7 +26,7 @@ const ProductGrid = ({ products, title, description }) => {
             key={product.id}
             className="transform transition duration-300 hover:translate-y-[-5px]"
           >
-            <ProductCard product={product} />
+            <ProductCard product={product} darkMode={darkMode} />
           </div>
         ))}
       </div>
@@ -28,10 +35,10 @@ const ProductGrid = ({ products, title, description }) => {
         <div className="text-center mt-10">
           <Link
             to="/shop"
-            className=" tracking-widest italic font-medium text-lg inline-block relative group"
+            className="tracking-widest italic font-medium text-lg inline-block relative group dark:text-white"
           >
             View All Products
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-dun transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-dun dark:bg-[#607466] transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </div>
       )}

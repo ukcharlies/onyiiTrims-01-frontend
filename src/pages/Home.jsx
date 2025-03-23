@@ -132,31 +132,31 @@ const Home = () => {
       </div>
 
       {/* Marquee Text Section */}
-      <div className="bg-white dark:bg-gray-900 py-12 overflow-hidden border-y-2 border-dun">
+      <div className="bg-white dark:bg-gray-900 py-12 overflow-hidden border-y-2 border-dun dark:border-[#607466]">
         <div className="relative flex items-center h-20">
           <div className="animate-marquee whitespace-nowrap absolute left-0">
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black dark:text-white border-b-2 border-dun dark:border-[#607466]">
               ELEVATED CRAFTSMANSHIP
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun dark:text-[#607466]">
               ★
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black dark:text-white border-b-2 border-dun dark:border-[#607466]">
               EXQUISITE TRIM DETAILS
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun dark:text-[#607466]">
               ★
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black dark:text-white border-b-2 border-dun dark:border-[#607466]">
               ELEVATED CRAFTSMANSHIP
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun dark:text-[#607466]">
               ★
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black border-b-2 border-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-black dark:text-white border-b-2 border-dun dark:border-[#607466]">
               EXQUISITE TRIM DETAILS
             </span>
-            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun">
+            <span className="mx-8 text-3xl md:text-4xl lg:text-5xl text-dun dark:text-[#607466]">
               ★
             </span>
           </div>
@@ -193,10 +193,10 @@ const Home = () => {
       <div className="bg-white dark:bg-gray-900 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-playfair text-3xl font-bold mb-4">
+            <h2 className="font-playfair text-3xl font-bold mb-4 dark:text-white">
               Why Choose Onyi Trims
             </h2>
-            <div className="w-24 h-1 bg-dun mx-auto mb-4"></div>
+            <div className="w-24 h-1 bg-dun dark:bg-[#607466] mx-auto mb-4"></div>
             <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               We provide premium quality trims and exceptional service to
               elevate your creative projects
@@ -205,15 +205,15 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 dark:bg-[#343E3D] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 dark:bg-[#607466]/20 rounded-full flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-8 h-8 text-dun"
+                  className="w-8 h-8 text-dun dark:text-[#607466]"
                 >
                   <path
                     strokeLinecap="round"
@@ -222,7 +222,9 @@ const Home = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2">Premium Quality</h3>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">
+                Premium Quality
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Carefully curated collection of high-quality trims and
                 embellishments sourced from the finest materials.
@@ -230,15 +232,15 @@ const Home = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 dark:bg-[#343E3D] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 dark:bg-[#607466]/20 rounded-full flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-8 h-8 text-dun"
+                  className="w-8 h-8 text-dun dark:text-[#607466]"
                 >
                   <path
                     strokeLinecap="round"
@@ -247,7 +249,9 @@ const Home = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2">Fast Shipping</h3>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">
+                Fast Shipping
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Quick and reliable delivery services to ensure your creative
                 projects stay on schedule.
@@ -255,15 +259,15 @@ const Home = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="flex flex-col items-center text-center p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-16 h-16 bg-dun/10 rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-gray-50 dark:bg-[#343E3D] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="w-16 h-16 bg-dun/10 dark:bg-[#607466]/20 rounded-full flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-8 h-8 text-dun"
+                  className="w-8 h-8 text-dun dark:text-[#607466]"
                 >
                   <path
                     strokeLinecap="round"
@@ -272,7 +276,9 @@ const Home = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-2">Expert Support</h3>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">
+                Expert Support
+              </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Our team of experts is always ready to assist you in finding the
                 perfect trims for your projects.
@@ -283,25 +289,27 @@ const Home = () => {
       </div>
 
       {/* Featured Collections Section */}
-      <div className="relative bg-gray-50">
+      <div className="relative bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-4 py-10">
           {loading.featured ? (
             <div className="flex justify-center items-center py-10">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-[#607466]"></div>
             </div>
           ) : error.featured ? (
             <div className="text-center py-10">
-              <p className="text-red-500">{error.featured}</p>
-              <p className="mt-2">
+              <p className="text-red-500 dark:text-red-400">{error.featured}</p>
+              <p className="mt-2 dark:text-gray-300">
                 Check if your backend server is running correctly.
               </p>
             </div>
           ) : featuredProducts.length === 0 ? (
             <div className="text-center py-10">
-              <h2 className="font-playfair text-3xl font-bold mb-4">
+              <h2 className="font-playfair text-3xl font-bold mb-4 dark:text-white">
                 Featured Collections
               </h2>
-              <p>No featured products available at the moment.</p>
+              <p className="dark:text-gray-300">
+                No featured products available at the moment.
+              </p>
             </div>
           ) : (
             <ProductGrid
@@ -323,7 +331,7 @@ const Home = () => {
       {/* Instagram Gallery Section */}
 
       {/* Newsletter Subscription Section */}
-      <div className="py-20 bg-dun">
+      <div className="py-20 bg-dun dark:bg-[#607466]">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-playfair text-3xl font-bold mb-4 text-white">
@@ -338,12 +346,12 @@ const Home = () => {
               <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-grow px-6 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="flex-grow px-6 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
                 required
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-white dark:bg-gray-800 text-dun font-medium rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
+                className="px-6 py-3 bg-white dark:bg-[#343E3D] text-dun dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
               >
                 Subscribe
               </button>

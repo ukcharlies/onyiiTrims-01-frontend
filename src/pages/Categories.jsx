@@ -10,7 +10,7 @@ import { useCart } from "../context/CartContext";
 const Categories = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const { apiUrl } = useGlobal();
+  const { apiUrl, darkMode } = useGlobal();
   const { addToCart } = useCart();
   const [initialLoadDone, setInitialLoadDone] = useState(false);
 
@@ -324,7 +324,7 @@ const Categories = () => {
       )}
 
       {/* Category Navigation */}
-      <div className="bg-gray-50 border-b border-gray-200">
+      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="overflow-x-auto py-4">
             <div className="flex space-x-6 min-w-max">
@@ -333,8 +333,8 @@ const Categories = () => {
                   key={category.id}
                   className={`whitespace-nowrap py-2 px-4 font-medium rounded-md transition-colors ${
                     category.id === categoryId
-                      ? "bg-dun text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                      ? `${darkMode ? "bg-[#607466]" : "bg-dun"} text-white`
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                   onClick={() => handleCategoryChange(category.id)}
                 >
@@ -372,7 +372,9 @@ const Categories = () => {
               <h1 className="text-3xl font-bold font-lora mb-3">
                 {currentCategory.name}
               </h1>
-              <p className="text-gray-700 dark:text-gray-300">{currentCategory.description}</p>
+              <p className="text-gray-700 dark:text-gray-300">
+                {currentCategory.description}
+              </p>
             </div>
 
             {/* Content Grid */}
@@ -380,7 +382,7 @@ const Categories = () => {
               {/* Sidebar - Subcategories */}
               <div className="lg:col-span-1">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-bold font-lora mb-4">
+                  <h2 className="text-xl font-bold font-lora mb-4 dark:text-white">
                     Subcategories
                   </h2>
 
@@ -389,11 +391,13 @@ const Categories = () => {
                       <Spinner size="sm" />
                     </div>
                   ) : error.subcategories ? (
-                    <div className="text-orange-500 text-sm mb-4">
+                    <div className="text-orange-500 dark:text-orange-300 text-sm mb-4">
                       {error.subcategories}
                     </div>
                   ) : subcategories.length === 0 ? (
-                    <p className="text-gray-500">No subcategories found</p>
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No subcategories found
+                    </p>
                   ) : (
                     <ul className="space-y-2">
                       {subcategories.map((sub) => (
@@ -402,8 +406,10 @@ const Categories = () => {
                             className={`w-full text-left px-3 py-2 rounded-md text-sm ${
                               activeSubcategory &&
                               activeSubcategory.id === sub.id
-                                ? "bg-dun text-white"
-                                : "hover:bg-gray-100 text-gray-800"
+                                ? `${
+                                    darkMode ? "bg-[#607466]" : "bg-dun"
+                                  } text-white`
+                                : `hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200`
                             }`}
                             onClick={() => handleSubcategoryClick(sub)}
                           >
@@ -420,7 +426,7 @@ const Categories = () => {
               <div className="lg:col-span-3">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold font-lora">
+                    <h2 className="text-2xl font-bold font-lora dark:text-white">
                       {activeSubcategory
                         ? `Products in ${activeSubcategory.name}`
                         : "All Products"}
@@ -429,7 +435,7 @@ const Categories = () => {
                     {activeSubcategory && (
                       <button
                         onClick={() => setActiveSubcategory(null)}
-                        className="text-sm text-dun hover:underline"
+                        className="text-sm text-dun dark:text-[#607466] hover:underline"
                       >
                         View all products
                       </button>
@@ -441,13 +447,13 @@ const Categories = () => {
                       <Spinner />
                     </div>
                   ) : error.products ? (
-                    <div className="bg-orange-50 text-orange-500 p-4 rounded-md mb-4">
+                    <div className="bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-300 p-4 rounded-md mb-4">
                       <p>{error.products}</p>
                     </div>
                   ) : products.length === 0 ? (
-                    <div className="bg-gray-50 rounded-lg p-8 text-center">
-                      <HiOutlineShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold mb-2">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
+                      <HiOutlineShoppingBag className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold mb-2 dark:text-white">
                         No products found
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -459,7 +465,9 @@ const Categories = () => {
                       {activeSubcategory && (
                         <button
                           onClick={() => setActiveSubcategory(null)}
-                          className="inline-block bg-dun hover:bg-dun/90 text-white px-6 py-2 rounded-md transition-colors"
+                          className={`inline-block ${
+                            darkMode ? "bg-[#607466]" : "bg-dun"
+                          } hover:opacity-90 text-white px-6 py-2 rounded-md transition-colors`}
                         >
                           View All Products
                         </button>
@@ -471,6 +479,7 @@ const Categories = () => {
                         <ProductCard
                           key={product.id}
                           product={product}
+                          darkMode={darkMode}
                           onAddToCart={() => handleAddToCart(product)}
                         />
                       ))}

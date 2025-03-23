@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useGlobal } from "../context/GlobalContext";
 
 const testimonials = [
   {
@@ -50,6 +51,7 @@ const testimonials = [
 
 const TestimonialCarousel = () => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const { darkMode } = useGlobal();
 
   // Auto-advance slides
   useEffect(() => {
@@ -79,7 +81,9 @@ const TestimonialCarousel = () => {
       <svg
         key={index}
         className={`w-5 h-5 ${
-          index < rating ? "text-yellow-300" : "text-gray-300"
+          index < rating
+            ? "text-yellow-300"
+            : `${darkMode ? "text-gray-600" : "text-gray-300"}`
         }`}
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
@@ -93,18 +97,40 @@ const TestimonialCarousel = () => {
 
   return (
     <div
-      className="relative w-full py-16 bg-gray-50 overflow-hidden"
+      className={`relative w-full py-16 ${
+        darkMode ? "bg-gray-800" : "bg-gray-50"
+      } overflow-hidden`}
       id="testimonial-carousel"
       style={{ zIndex: 0 }}
     >
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-40 h-40 md:w-60 md:h-60 bg-dun/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-40 h-40 md:w-60 md:h-60 bg-dun/5 rounded-full translate-x-1/2 translate-y-1/2"></div>
-      <div className="absolute top-1/4 right-10 w-20 h-20 bg-dun/5 rounded-full"></div>
-      <div className="absolute bottom-1/4 left-10 w-20 h-20 bg-dun/5 rounded-full"></div>
+      <div
+        className={`absolute top-0 left-0 w-40 h-40 md:w-60 md:h-60 ${
+          darkMode ? "bg-[#607466]/10" : "bg-dun/5"
+        } rounded-full -translate-x-1/2 -translate-y-1/2`}
+      ></div>
+      <div
+        className={`absolute bottom-0 right-0 w-40 h-40 md:w-60 md:h-60 ${
+          darkMode ? "bg-[#607466]/10" : "bg-dun/5"
+        } rounded-full translate-x-1/2 translate-y-1/2`}
+      ></div>
+      <div
+        className={`absolute top-1/4 right-10 w-20 h-20 ${
+          darkMode ? "bg-[#607466]/10" : "bg-dun/5"
+        } rounded-full`}
+      ></div>
+      <div
+        className={`absolute bottom-1/4 left-10 w-20 h-20 ${
+          darkMode ? "bg-[#607466]/10" : "bg-dun/5"
+        } rounded-full`}
+      ></div>
 
       {/* Double quotation mark */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 text-dun/10 pointer-events-none">
+      <div
+        className={`absolute top-20 left-1/2 -translate-x-1/2 ${
+          darkMode ? "text-[#607466]/20" : "text-dun/10"
+        } pointer-events-none`}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
@@ -117,11 +143,23 @@ const TestimonialCarousel = () => {
 
       {/* Carousel heading */}
       <div className="text-center mb-12 relative z-10">
-        <h2 className="font-playfair text-3xl font-bold mb-4">
+        <h2
+          className={`font-playfair text-3xl font-bold mb-4 ${
+            darkMode ? "text-white" : ""
+          }`}
+        >
           What Our Customers Say
         </h2>
-        <div className="w-24 h-1 bg-dun mx-auto mb-4"></div>
-        <p className="text-gray-600 max-w-3xl mx-auto">
+        <div
+          className={`w-24 h-1 ${
+            darkMode ? "bg-[#607466]" : "bg-dun"
+          } mx-auto mb-4`}
+        ></div>
+        <p
+          className={`${
+            darkMode ? "text-gray-300" : "text-gray-600"
+          } max-w-3xl mx-auto`}
+        >
           Discover why designers and crafters choose our premium trims and
           embellishments
         </p>
@@ -143,22 +181,40 @@ const TestimonialCarousel = () => {
                 </div>
 
                 <blockquote>
-                  <p className="text-xl md:text-2xl text-center font-medium text-gray-900 mb-8">
+                  <p
+                    className={`text-xl md:text-2xl text-center font-medium ${
+                      darkMode ? "text-white" : "text-gray-900"
+                    } mb-8`}
+                  >
                     "{testimonial.content}"
                   </p>
                 </blockquote>
 
                 <figcaption className="flex items-center justify-center mt-6 space-x-3">
                   <img
-                    className="w-10 h-10 rounded-full object-cover border-2 border-dun"
+                    className={`w-10 h-10 rounded-full object-cover border-2 ${
+                      darkMode ? "border-[#607466]" : "border-dun"
+                    }`}
                     src={testimonial.image}
                     alt={`${testimonial.author} profile`}
                   />
-                  <div className="flex items-center divide-x-2 divide-dun/30">
-                    <cite className="pr-3 font-medium text-gray-900">
+                  <div
+                    className={`flex items-center divide-x-2 ${
+                      darkMode ? "divide-[#607466]/30" : "divide-dun/30"
+                    }`}
+                  >
+                    <cite
+                      className={`pr-3 font-medium ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {testimonial.author}
                     </cite>
-                    <cite className="pl-3 text-sm text-gray-600">
+                    <cite
+                      className={`pl-3 text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
                       {testimonial.position}
                     </cite>
                   </div>
@@ -175,10 +231,14 @@ const TestimonialCarousel = () => {
           <button
             key={index}
             type="button"
-            className={`w-3 h-3 rounded-full border border-dun/30 transition-all duration-300 ${
+            className={`w-3 h-3 rounded-full ${
+              darkMode ? "border-[#607466]/30" : "border-dun/30"
+            } border transition-all duration-300 ${
               activeSlide === index
-                ? "bg-dun w-6"
-                : "bg-gray-200 hover:bg-gray-300"
+                ? `${darkMode ? "bg-[#607466]" : "bg-dun"} w-6`
+                : `${darkMode ? "bg-gray-600" : "bg-gray-200"} hover:${
+                    darkMode ? "bg-gray-500" : "bg-gray-300"
+                  }`
             }`}
             aria-current={activeSlide === index}
             aria-label={`Testimonial ${index + 1}`}
@@ -190,11 +250,15 @@ const TestimonialCarousel = () => {
       {/* Slider controls */}
       <button
         type="button"
-        className="absolute top-1/2 left-4 z-30 flex items-center justify-center -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 hover:bg-white shadow-md cursor-pointer transition-all duration-300 group focus:outline-none"
+        className={`absolute top-1/2 left-4 z-30 flex items-center justify-center -translate-y-1/2 w-10 h-10 rounded-full ${
+          darkMode
+            ? "bg-gray-700/70 hover:bg-gray-700"
+            : "bg-white/70 hover:bg-white"
+        } shadow-md cursor-pointer transition-all duration-300 group focus:outline-none`}
         onClick={goToPrevSlide}
       >
         <svg
-          className="w-4 h-4 text-gray-800"
+          className={`w-4 h-4 ${darkMode ? "text-gray-300" : "text-gray-800"}`}
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -213,11 +277,15 @@ const TestimonialCarousel = () => {
 
       <button
         type="button"
-        className="absolute top-1/2 right-4 z-30 flex items-center justify-center -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 hover:bg-white shadow-md cursor-pointer transition-all duration-300 group focus:outline-none"
+        className={`absolute top-1/2 right-4 z-30 flex items-center justify-center -translate-y-1/2 w-10 h-10 rounded-full ${
+          darkMode
+            ? "bg-gray-700/70 hover:bg-gray-700"
+            : "bg-white/70 hover:bg-white"
+        } shadow-md cursor-pointer transition-all duration-300 group focus:outline-none`}
         onClick={goToNextSlide}
       >
         <svg
-          className="w-4 h-4 text-gray-800"
+          className={`w-4 h-4 ${darkMode ? "text-gray-300" : "text-gray-800"}`}
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

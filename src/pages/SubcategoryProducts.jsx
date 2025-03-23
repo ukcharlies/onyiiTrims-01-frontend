@@ -15,6 +15,7 @@ const SubcategoryProducts = () => {
   const { subcategoryId } = useParams();
   const { apiUrl } = useGlobal();
   const { addToCart } = useCart();
+  const { darkMode } = useGlobal();
 
   const [subcategory, setSubcategory] = useState(null);
   const [parentCategory, setParentCategory] = useState(null);
@@ -159,7 +160,10 @@ const SubcategoryProducts = () => {
             {/* Breadcrumb */}
             <div className="mb-6">
               <nav className="flex text-sm">
-                <Link to="/" className="text-gray-500 hover:text-dun">
+                <Link
+                  to="/"
+                  className="text-gray-500 dark:text-gray-400 hover:text-dun dark:hover:text-[#607466]"
+                >
                   Home
                 </Link>
                 <HiChevronRight className="mx-2 h-5 w-5 text-gray-400" />
@@ -167,14 +171,20 @@ const SubcategoryProducts = () => {
                   <>
                     <Link
                       to={`/categories/${parentCategory.id}`}
-                      className="text-gray-500 hover:text-dun"
+                      className="text-gray-500 dark:text-gray-400 hover:text-dun dark:hover:text-[#607466]"
                     >
                       {parentCategory.name}
                     </Link>
                     <HiChevronRight className="mx-2 h-5 w-5 text-gray-400" />
                   </>
                 )}
-                <span className="text-dun font-medium">{subcategory.name}</span>
+                <span
+                  className={`${
+                    darkMode ? "text-[#607466]" : "text-dun"
+                  } font-medium`}
+                >
+                  {subcategory.name}
+                </span>
               </nav>
             </div>
 
@@ -182,7 +192,9 @@ const SubcategoryProducts = () => {
             {parentCategory && (
               <Link
                 to={`/categories/${parentCategory.id}`}
-                className="inline-flex items-center text-dun hover:underline mb-6"
+                className={`inline-flex items-center ${
+                  darkMode ? "text-[#607466]" : "text-dun"
+                } hover:underline mb-6`}
               >
                 <HiArrowLeft className="mr-2 h-4 w-4" />
                 Back to {parentCategory.name}
@@ -191,35 +203,43 @@ const SubcategoryProducts = () => {
 
             {/* Subcategory Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold font-lora mb-3">
+              <h1 className="text-3xl font-bold font-lora mb-3 dark:text-white">
                 {subcategory.name}
               </h1>
-              <p className="text-gray-700">{subcategory.description}</p>
+              <p className="text-gray-700 dark:text-gray-300">
+                {subcategory.description}
+              </p>
             </div>
 
             {/* Products */}
             <div>
-              <h2 className="text-2xl font-bold font-lora mb-6">Products</h2>
+              <h2 className="text-2xl font-bold font-lora mb-6 dark:text-white">
+                Products
+              </h2>
 
               {loading.products ? (
                 <div className="flex justify-center py-12">
                   <Spinner />
                 </div>
               ) : error.products ? (
-                <div className="bg-orange-50 text-orange-500 p-4 rounded-md mb-4">
+                <div className="bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-300 p-4 rounded-md mb-4">
                   <p>{error.products}</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className="bg-gray-50 rounded-lg p-8 text-center">
-                  <HiOutlineShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No products found</h3>
-                  <p className="text-gray-600 mb-4">
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
+                  <HiOutlineShoppingBag className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2 dark:text-white">
+                    No products found
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
                     We couldn't find any products in this subcategory.
                   </p>
                   {parentCategory && (
                     <Link
                       to={`/categories/${parentCategory.id}`}
-                      className="inline-block bg-dun hover:bg-dun/90 text-white px-6 py-2 rounded-md transition-colors"
+                      className={`inline-block ${
+                        darkMode ? "bg-[#607466]" : "bg-dun"
+                      } hover:opacity-90 text-white px-6 py-2 rounded-md transition-colors`}
                     >
                       Back to {parentCategory.name}
                     </Link>
@@ -231,6 +251,7 @@ const SubcategoryProducts = () => {
                     <ProductCard
                       key={product.id}
                       product={product}
+                      darkMode={darkMode}
                       onAddToCart={() => handleAddToCart(product)}
                     />
                   ))}

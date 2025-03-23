@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { useCart } from "../context/CartContext";
 
-const ProductCard = ({ product, onAddToCart }) => {
+const ProductCard = ({ product, onAddToCart, darkMode = false }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const { id, name, price, images = [], description, slug } = product;
@@ -35,9 +35,16 @@ const ProductCard = ({ product, onAddToCart }) => {
   const fallbackImage =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
+  // Dark mode and light mode card styles
+  const cardBgClass = darkMode ? "bg-[#343E3D] text-white" : "bg-white";
+  const textClass = darkMode ? "text-white" : "text-gray-800";
+  const textSecondaryClass = darkMode ? "text-gray-300" : "text-gray-600";
+  const buttonBgClass = darkMode ? "bg-[#607466]" : "bg-dun";
+  const hoverTextClass = darkMode ? "hover:text-[#607466]" : "hover:text-dun";
+
   return (
     <div
-      className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+      className={`${cardBgClass} rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}
       onClick={handleCardClick}
     >
       {/* Product Image */}
@@ -55,7 +62,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         <div className="absolute bottom-2 right-2">
           <button
             onClick={handleAddToCart}
-            className="p-2 bg-dun text-white rounded-full hover:bg-dun/90 transition-colors duration-200"
+            className={`p-2 ${buttonBgClass} text-white rounded-full hover:opacity-90 transition-colors duration-200`}
             title="Add to cart"
           >
             <HiOutlineShoppingCart className="h-5 w-5" />
@@ -65,12 +72,14 @@ const ProductCard = ({ product, onAddToCart }) => {
 
       {/* Product Info */}
       <div className="p-4">
-        <h3 className="text-lg font-medium text-gray-800 hover:text-dun transition-colors duration-200 mb-1 truncate">
+        <h3
+          className={`text-lg font-medium ${textClass} ${hoverTextClass} transition-colors duration-200 mb-1 truncate`}
+        >
           {name}
         </h3>
 
         <p
-          className="text-gray-600 text-sm mb-3 line-clamp-2"
+          className={`${textSecondaryClass} text-sm mb-3 line-clamp-2`}
           title={description}
         >
           {description}
@@ -78,7 +87,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
         <div className="flex items-center justify-between">
           <div className="mt-1">
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-lg font-medium">
               {price ? formatPrice(price) : "₦0.00"}
             </p>
           </div>
