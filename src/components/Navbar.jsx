@@ -26,6 +26,11 @@ const NavbarComponent = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useCart();
   const { isAuthenticated, user, logout } = useGlobal();
+  const location = useLocation();
+
+  // Pages that should always have the colored navbar
+  const coloredNavPages = ["/dashboard", "/profile"];
+  const shouldAlwaysBeColored = coloredNavPages.includes(location.pathname);
 
   const cartItemCount = cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -42,7 +47,7 @@ const NavbarComponent = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 36) {
+      if (window.scrollY > 36 || shouldAlwaysBeColored) {
         // Height of announcement bar
         setIsScrolled(true);
       } else {
@@ -50,9 +55,12 @@ const NavbarComponent = () => {
       }
     };
 
+    // Initial call to set correct state based on current page
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location.pathname, shouldAlwaysBeColored]);
 
   const handleSearch = (e) => {
     e.preventDefault();

@@ -50,9 +50,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl p-4">
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+    <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-3xl font-bold mb-6">My Profile</h1>
 
         {isEditing ? (
           <form onSubmit={handleUpdate} className="mb-6">
