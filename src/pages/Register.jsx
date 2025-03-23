@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { toast } from "react-toastify";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 
 const Register = () => {
   const {
@@ -14,11 +15,21 @@ const Register = () => {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
   const [shakeForm, setShakeForm] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register: registerUser, login } = useGlobal();
   const navigate = useNavigate();
 
   // For password validation
   const password = watch("password");
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const onSubmit = async (data) => {
     setServerError("");
@@ -216,26 +227,39 @@ const Register = () => {
             <label className="block text-gray-700 mb-2" htmlFor="password">
               Password*
             </label>
-            <input
-              id="password"
-              type="password"
-              className={`w-full p-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent`}
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                  message:
-                    "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
-                },
-              })}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className={`w-full p-2 border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent pr-10`}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                    message:
+                      "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+                  },
+                })}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? (
+                  <HiEyeOff className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <HiEye className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
+            </div>
             {errors.password && (
               <p className="mt-1 text-red-500 text-sm">
                 {errors.password.message}
@@ -250,18 +274,31 @@ const Register = () => {
             >
               Confirm Password*
             </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              className={`w-full p-2 border ${
-                errors.confirmPassword ? "border-red-500" : "border-gray-300"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent`}
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: (value) =>
-                  value === password || "The passwords do not match",
-              })}
-            />
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                className={`w-full p-2 border ${
+                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent pr-10`}
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) =>
+                    value === password || "The passwords do not match",
+                })}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={toggleConfirmPasswordVisibility}
+              >
+                {showConfirmPassword ? (
+                  <HiEyeOff className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <HiEye className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
+            </div>
             {errors.confirmPassword && (
               <p className="mt-1 text-red-500 text-sm">
                 {errors.confirmPassword.message}

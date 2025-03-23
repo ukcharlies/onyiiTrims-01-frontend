@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { toast } from "react-toastify";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 
 const Login = () => {
   const {
@@ -18,6 +19,7 @@ const Login = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [shakeForm, setShakeForm] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Check if there's a redirect path
   const from = location.state?.from?.pathname || "/";
@@ -30,6 +32,10 @@ const Login = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -139,20 +145,33 @@ const Login = () => {
             <label className="block text-gray-700 mb-2" htmlFor="password">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              className={`w-full p-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent`}
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-              })}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className={`w-full p-2 border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-dun focus:border-transparent pr-10`}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                })}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? (
+                  <HiEyeOff className="h-5 w-5 text-gray-500" />
+                ) : (
+                  <HiEye className="h-5 w-5 text-gray-500" />
+                )}
+              </button>
+            </div>
             {errors.password && (
               <p className="mt-1 text-red-500 text-sm">
                 {errors.password.message}
