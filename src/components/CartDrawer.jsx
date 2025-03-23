@@ -64,9 +64,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     />
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-gray-600">
-                        ${Number(item.price).toFixed(2)}
-                      </p>
+                      <div className="text-right text-gray-600">
+                        <p className="font-medium text-gray-900">
+                          ₦{(item.price * item.quantity).toFixed(2)}
+                        </p>
+                        <p className="text-sm">₦{item.price.toFixed(2)} each</p>
+                      </div>
                       <div className="flex items-center space-x-2 mt-2">
                         <button
                           onClick={() =>
@@ -104,11 +107,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {cartItems.length > 0 && (
             <div className="border-t p-4">
-              <div className="flex justify-between mb-4">
-                <span className="font-semibold">Total:</span>
-                <span className="font-semibold">
-                  ${getCartTotal().toFixed(2)}
-                </span>
+              <div className="flex justify-between text-lg font-medium py-4 border-t border-gray-200">
+                <span>Total</span>
+                <span>₦{getCartTotal().toFixed(2)}</span>
               </div>
               <Link
                 to="/checkout"

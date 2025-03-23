@@ -64,7 +64,7 @@ const Dashboard = () => {
                       {item.name}
                     </div>
                     <div className="pl-2 text-gray-700">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₦{(item.price * item.quantity).toFixed(2)}
                     </div>
                   </div>
                 ))}
@@ -72,7 +72,7 @@ const Dashboard = () => {
               <div className="border-t border-gray-200 pt-2 mb-3">
                 <p className="text-lg font-medium flex justify-between">
                   <span>Total:</span>
-                  <span>${getCartTotal().toFixed(2)}</span>
+                  <span>₦{getCartTotal().toFixed(2)}</span>
                 </p>
               </div>
             </>
@@ -144,7 +144,7 @@ const Dashboard = () => {
                       {order.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4">${order.total.toFixed(2)}</td>
+                  <td className="py-3 px-4">₦{order.total.toFixed(2)}</td>
                   <td className="py-3 px-4">
                     <Link
                       to={`/orders/${order.id}`}

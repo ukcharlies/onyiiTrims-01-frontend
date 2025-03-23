@@ -1,74 +1,87 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { HiOutlineShoppingCart } from "react-icons/hi";
 import { useCart } from "../context/CartContext";
-import { HiShoppingCart } from "react-icons/hi";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart }) => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const { id, name, price, images = [], description, slug } = product;
 
-  // Ensure price is a number and handle potential undefined/null values
-  const price =
-    typeof product.price === "string"
-      ? parseFloat(product.price)
-      : product.price || 0;
-
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    addToCart(product);
+  // Format price with Naira symbol
+  const formatPrice = (value) => {
+    return `₦${new Intl.NumberFormat("en-NG").format(value)}`;
   };
 
+  // Handle add to cart
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Use onAddToCart if provided, otherwise use the context
+    if (onAddToCart) {
+      onAddToCart();
+    } else {
+      addToCart(product);
+    }
+  };
+
+  // Handle card click to navigate to product details
+  const handleCardClick = () => {
+    // Navigate to product details page using id only (not slug)
+    navigate(`/products/${id}`);
+  };
+
+  // Local fallback image (base64 encoded small gray image)
+  const fallbackImage =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
   return (
-    <div className="relative w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-      {/* Product badge */}
-      {product.isHotBuy && (
-        <div className="absolute top-2 left-2 z-10 bg-dun text-white text-xs font-semibold px-2 py-1 rounded-sm">
-          Hot Buy
-        </div>
-      )}
-      {product.isNewlyAdded && (
-        <div className="absolute top-2 right-2 z-10 bg-emerald-500 text-white text-xs font-semibold px-2 py-1 rounded-sm">
-          New
-        </div>
-      )}
+    <div
+      className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+      onClick={handleCardClick}
+    >
+      {/* Product Image */}
+      <div className="relative h-56 bg-gray-100">
+        <img
+          src={images && images.length > 0 ? images[0] : fallbackImage}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = fallbackImage;
+          }}
+        />
 
-      {/* Image container with hover effect */}
-      <Link to={`/product/${product.slug}`} className="block overflow-hidden">
-        <div className="h-56 w-full overflow-hidden">
-          <img
-            className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-110"
-            src={product.images?.[0] || "/placeholder-image.jpg"}
-            alt={product.name}
-          />
-        </div>
-      </Link>
-
-      {/* Product info */}
-      <div className="p-4">
-        <Link to={`/product/${product.slug}`}>
-          <h3 className="text-lg font-medium text-gray-900 mb-1 hover:text-dun transition-colors">
-            {product.name}
-          </h3>
-        </Link>
-
-        {/* Category info */}
-        <p className="text-sm text-gray-500 mb-3">
-          {product.subcategory?.category?.name} / {product.subcategory?.name}
-        </p>
-
-        {/* Price and add to cart */}
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xl font-bold text-gray-900">
-            ${price.toFixed(2)}
-          </span>
-
+        {/* Quick add to cart button */}
+        <div className="absolute bottom-2 right-2">
           <button
             onClick={handleAddToCart}
-            className="flex items-center text-white bg-dun hover:bg-dun/90 focus:ring-2 focus:ring-dun/50 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 transition-colors"
-            aria-label="Add to cart"
+            className="p-2 bg-dun text-white rounded-full hover:bg-dun/90 transition-colors duration-200"
+            title="Add to cart"
           >
-            <HiShoppingCart className="w-4 h-4 mr-1" />
-            <span>Add</span>
+            <HiOutlineShoppingCart className="h-5 w-5" />
           </button>
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="p-4">
+        <h3 className="text-lg font-medium text-gray-800 hover:text-dun transition-colors duration-200 mb-1 truncate">
+          {name}
+        </h3>
+
+        <p
+          className="text-gray-600 text-sm mb-3 line-clamp-2"
+          title={description}
+        >
+          {description}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div className="mt-1">
+            <p className="text-lg font-medium text-gray-900">
+              ₦{price.toFixed(2)}
+            </p>
+          </div>
         </div>
       </div>
     </div>

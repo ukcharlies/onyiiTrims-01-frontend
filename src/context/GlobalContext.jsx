@@ -173,6 +173,7 @@ export const GlobalProvider = ({ children }) => {
         logout,
         register,
         updateUser,
+        apiUrl: API_URL,
       }}
     >
       {children}

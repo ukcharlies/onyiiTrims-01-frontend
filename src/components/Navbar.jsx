@@ -29,8 +29,20 @@ const NavbarComponent = () => {
   const location = useLocation();
 
   // Pages that should always have the colored navbar
-  const coloredNavPages = ["/dashboard", "/profile"];
-  const shouldAlwaysBeColored = coloredNavPages.includes(location.pathname);
+  const coloredNavPages = [
+    "/dashboard",
+    "/profile",
+    "/contact",
+    "/about",
+    "/categories",
+    "/subcategories",
+    "/orders",
+    "/checkout",
+    "/products",
+  ];
+  const shouldAlwaysBeColored = coloredNavPages.some((page) =>
+    location.pathname.startsWith(page)
+  );
 
   const cartItemCount = cartItems.reduce(
     (total, item) => total + item.quantity,
