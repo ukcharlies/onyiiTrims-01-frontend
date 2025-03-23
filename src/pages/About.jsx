@@ -54,22 +54,35 @@ const About = () => {
             <div>
               <h2 className="text-3xl font-bold font-lora mb-6">Our Story</h2>
               <p className="text-gray-700 mb-4">
-                Onyi Trims was born from a passion for quality textiles and a
-                vision to create products that blend traditional craftsmanship
-                with contemporary design. Our founder, Onyinyechi, started this
-                journey with a simple belief: everyone deserves access to
-                premium fabrics that tell a story.
+                Onyii Trims was born from a deep passion for craftsmanship and a
+                dream to make quality trimmings accessible to every tailor,
+                designer, and creative mind. Our founder, Onyinyechi, started
+                with a simple yet powerful belief: the smallest details can
+                transform a piece of fabric into something extraordinary. What
+                began as a humble collection of carefully selected trimmings has
+                grown into a trusted source for premium-quality laces, buttons,
+                threads, and finishing touches that breathe life into garments.
+                Each piece we offer carries a story—of heritage, artistry, and a
+                commitment to excellence.
               </p>
               <p className="text-gray-700 mb-4">
-                What began as a small collection of handpicked fabrics has grown
-                into a curated selection of the finest materials sourced from
-                around the world. Each product in our collection reflects our
-                commitment to quality, sustainability, and timeless elegance.
+                At Onyii Trims, we don’t just sell materials; we provide the
+                final touch that completes your vision. Whether you’re a tailor
+                crafting bespoke designs, a retailer seeking the best for your
+                customers, or a designer pushing creative boundaries, we are
+                here to support your journey.
               </p>
               <p className="text-gray-700">
-                Today, we continue to stay true to our roots while embracing
-                innovation, bringing you fabrics that inspire creativity and
-                elevate your projects to new heights.
+                As we grow, we remain rooted in our values—quality,
+                authenticity, and innovation. Every stitch, every embellishment,
+                and every detail matter to us, just as they matter to you.
+                Together, let’s continue to create pieces that tell stories,
+                inspire confidence, and celebrate beauty in every form.As we
+                grow, we remain rooted in our values—quality, authenticity, and
+                innovation. Every stitch, every embellishment, and every detail
+                matter to us, just as they matter to you. Together, let’s
+                continue to create pieces that tell stories, inspire confidence,
+                and celebrate beauty in every form..
               </p>
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl relative min-h-[300px] bg-gray-100">
@@ -158,7 +171,7 @@ const About = () => {
                 )}
                 <img
                   src="/images/team-founder.jpg"
-                  alt="Onyinyechi Johnson"
+                  alt="Ukachi Onyinyechi"
                   className={`w-full h-full object-cover ${
                     imagesLoaded.team1 ? "opacity-100" : "opacity-0"
                   } transition-opacity duration-300`}
@@ -168,9 +181,9 @@ const About = () => {
                 />
               </div>
               <h3 className="text-xl font-bold font-lora mb-1">
-                Onyinyechi Johnson
+                Ukachi Onyinyechi
               </h3>
-              <p className="text-dun mb-3">Founder & Creative Director</p>
+              <p className="text-dun mb-3">Founder & Operations Lead</p>
               <p className="text-gray-700 max-w-xs mx-auto">
                 With over 15 years in textile design, Onyinyechi brings her
                 passion for fabric and pattern to every aspect of Onyi Trims.
@@ -185,7 +198,7 @@ const About = () => {
                 )}
                 <img
                   src="/images/team-design.jpg"
-                  alt="Michael Williams"
+                  alt="6ix theDev"
                   className={`w-full h-full object-cover ${
                     imagesLoaded.team2 ? "opacity-100" : "opacity-0"
                   } transition-opacity duration-300`}
@@ -194,13 +207,14 @@ const About = () => {
                   onError={(e) => handleImageError(e, "team2")}
                 />
               </div>
-              <h3 className="text-xl font-bold font-lora mb-1">
-                Michael Williams
-              </h3>
-              <p className="text-dun mb-3">Head of Design</p>
+              <h3 className="text-xl font-bold font-lora mb-1">6ix theDev</h3>
+              <p className="text-dun mb-3">Technical & Customer Support Lead</p>
               <p className="text-gray-700 max-w-xs mx-auto">
-                Michael leads our design team with an innovative approach that
-                balances contemporary trends with timeless appeal.
+                6ix is responsible for managing the Onyii Trims website and
+                handling all technical aspects to ensure a seamless shopping
+                experience. He also serves as the first point of contact for
+                customer inquiries, resolving issues before escalating them when
+                necessary.
               </p>
             </div>
             <div className="text-center">
@@ -212,7 +226,7 @@ const About = () => {
                 )}
                 <img
                   src="/images/team-operations.jpg"
-                  alt="Sarah Chen"
+                  alt="Ukachi Augustine "
                   className={`w-full h-full object-cover ${
                     imagesLoaded.team3 ? "opacity-100" : "opacity-0"
                   } transition-opacity duration-300`}
@@ -221,11 +235,17 @@ const About = () => {
                   onError={(e) => handleImageError(e, "team3")}
                 />
               </div>
-              <h3 className="text-xl font-bold font-lora mb-1">Sarah Chen</h3>
-              <p className="text-dun mb-3">Operations Manager</p>
+              <h3 className="text-xl font-bold font-lora mb-1">
+                Ukachi Augustine{" "}
+              </h3>
+              <p className="text-dun mb-3">
+                Finance, Logistics & Communications Manager
+              </p>
               <p className="text-gray-700 max-w-xs mx-auto">
-                Sarah ensures that every customer experience with Onyi Trims is
-                smooth, efficient, and exceeds expectations.
+                Augustine manages financial transactions, customer emails, and
+                shipping logistics. From processing payments to ensuring orders
+                are packed and delivered on time, he keeps Onyii Trims running
+                efficiently behind the scenes.
               </p>
             </div>
           </div>
