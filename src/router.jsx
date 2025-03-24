@@ -14,6 +14,8 @@ import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import ProtectedRoute from "./components/ProtectedRoute";
+import CheckoutProtectedRoute from "./components/CheckoutProtectedRoute";
 
 // This component will fetch categories and redirect to the first one
 const CategoriesRedirect = () => {
@@ -45,31 +47,45 @@ const router = createBrowserRouter([
         path: "register",
         element: <Register />,
       },
+      // Protected routes that require authentication
       {
-        path: "profile",
-        element: <Profile />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "profile",
+            element: <Profile />,
+          },
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+          },
+          // Order routes
+          {
+            path: "orders",
+            element: <Orders />,
+          },
+          {
+            path: "orders/:orderId",
+            element: <OrderDetail />,
+          },
+        ],
       },
-      {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
-      // Order routes
-      {
-        path: "orders",
-        element: <Orders />,
-      },
-      {
-        path: "orders/:orderId",
-        element: <OrderDetail />,
-      },
-      // Checkout routes
+      // Checkout routes - must be authenticated
       {
         path: "checkout",
-        element: <Checkout />,
+        element: (
+          <CheckoutProtectedRoute>
+            <Checkout />
+          </CheckoutProtectedRoute>
+        ),
       },
       {
         path: "checkout/success",
-        element: <OrderSuccess />,
+        element: (
+          <CheckoutProtectedRoute>
+            <OrderSuccess />
+          </CheckoutProtectedRoute>
+        ),
       },
       // Categories routes
       {

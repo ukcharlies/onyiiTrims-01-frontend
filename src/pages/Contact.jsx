@@ -559,14 +559,14 @@ const Contact = () => {
                 }`}
               >
                 I agree to the{" "}
-                <Link
+          <Link
                   to="/privacy-policy"
                   className={`${
                     darkMode ? "text-[#607466]" : "text-dun"
                   } hover:underline`}
                 >
                   Privacy Policy
-                </Link>
+          </Link>
               </label>
             </div>
 
