@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { useCart } from "../context/CartContext";
 import { toast } from "react-toastify";
@@ -12,22 +12,24 @@ const Profile = () => {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
-    phoneNumber: user?.phoneNumber || "", // Changed from phone to phoneNumber
+    phoneNumber: user?.phoneNumber || "",
     address: user?.address || "",
   });
+
+  const navigate = useNavigate();
 
   // Redirect if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast.info("You've been logged out");
+    navigate("/login");
   };
-  // Function to open cart drawer
+
   const openCartDrawer = () => {
-    // Find the cart button in the navbar and click it
     const cartButton = document.querySelector('[aria-label="Open cart"]');
     if (cartButton) {
       cartButton.click();
@@ -53,10 +55,18 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl p-4 pt-36 md:pt-40">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">
-        Profile
-      </h1>
+    <div className="container mx-auto max-w-7xl p-4 pt-12 md:pt-40">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Profile
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+        >
+          Logout
+        </button>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Profile Information Section */}
@@ -98,8 +108,7 @@ const Profile = () => {
                       Phone Number
                     </label>
                     <p className="mt-1 text-gray-900 dark:text-white">
-                      {user?.phoneNumber || "Not provided"}{" "}
-                      {/* Changed from phone to phoneNumber */}
+                      {user?.phoneNumber || "Not provided"}
                     </p>
                   </div>
                   <div>
@@ -181,16 +190,16 @@ const Profile = () => {
 
                   <div>
                     <label
-                      htmlFor="phoneNumber" // Changed from "phone"
+                      htmlFor="phoneNumber"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
-                      Phone Number // Updated label
+                      Phone Number
                     </label>
                     <input
                       type="tel"
-                      id="phoneNumber" // Changed from "phone"
-                      name="phoneNumber" // Changed from "phone"
-                      value={formData.phoneNumber} // Changed from "phone"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
                       onChange={handleChange}
                       className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-dun dark:focus:border-[#607466] focus:ring-dun dark:focus:ring-[#607466] dark:bg-gray-700 dark:text-white"
                     />
