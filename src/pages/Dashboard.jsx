@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
 import { useGlobal } from "../context/GlobalContext";
 import { useCart } from "../context/CartContext";
 import { getUserOrders } from "../services/api";
 
 const Dashboard = () => {
   const { user } = useGlobal();
+  const navigate = useNavigate(); // Add navigate
   const { cartItems, getCartTotal } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (user?.role === "ADMIN") {
+      navigate("/admin"); // Redirect to AdminDashboard if user is admin
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -38,9 +45,11 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">
-        Dashboard
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Dashboard
+        </h1>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* User Info Card */}

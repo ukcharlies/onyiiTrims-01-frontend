@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CheckoutProtectedRoute from "./components/CheckoutProtectedRoute";
 import Shop from "./pages/Shop";
 import SearchResults from "./pages/SearchResults";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // This component will fetch categories and redirect to the first one
 const CategoriesRedirect = () => {
@@ -69,6 +70,11 @@ const router = createBrowserRouter([
           {
             path: "dashboard",
             element: <Dashboard />,
+          },
+          // Admin route
+          {
+            path: "admin",
+            element: <AdminDashboard />,
           },
           // Order routes
           {
