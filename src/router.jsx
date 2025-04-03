@@ -14,8 +14,11 @@ import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import OrderFailed from "./pages/OrderFailed";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CheckoutProtectedRoute from "./components/CheckoutProtectedRoute";
+import Shop from "./pages/Shop";
+import SearchResults from "./pages/SearchResults";
 
 // This component will fetch categories and redirect to the first one
 const CategoriesRedirect = () => {
@@ -38,6 +41,14 @@ const router = createBrowserRouter([
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+        path: "shop",
+        element: <Shop />,
+      },
+      {
+        path: "search",
+        element: <SearchResults />,
       },
       {
         path: "login",
@@ -105,6 +116,15 @@ const router = createBrowserRouter([
         path: "products/:productId",
         element: <ProductDetails />,
       },
+      {
+        path: "order/success",
+        element: <OrderSuccess />,
+      },
+      {
+        path: "order/failed",
+        element: <OrderFailed />,
+      },
+      { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
 ]);

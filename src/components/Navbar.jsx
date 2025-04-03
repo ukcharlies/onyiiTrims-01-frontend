@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { useCart } from "../context/CartContext";
+import { searchProducts } from "../services/api";
 import {
   HiOutlineShoppingBag,
   HiOutlineMenu,
@@ -17,16 +18,21 @@ import {
   HiTruck,
 } from "react-icons/hi";
 import CartDrawer from "./CartDrawer";
+import ProductCard from "./ProductCard";
 
 const NavbarComponent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useCart();
-  const { isAuthenticated, user, logout } = useGlobal();
+  const { isAuthenticated, user, logout, darkMode } = useGlobal();
   const location = useLocation();
+  const navigate = useNavigate();
+  const searchTimeoutRef = useRef(null);
 
   // Pages that should always have the colored navbar
   const coloredNavPages = [
@@ -39,6 +45,8 @@ const NavbarComponent = () => {
     "/orders",
     "/checkout",
     "/products",
+    "/shop",
+    "/order",
   ];
   const shouldAlwaysBeColored = coloredNavPages.some((page) =>
     location.pathname.startsWith(page)
@@ -74,10 +82,48 @@ const NavbarComponent = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname, shouldAlwaysBeColored]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    // Add your search logic here
-    console.log("Searching for:", searchQuery);
+    if (!searchQuery.trim()) return;
+
+    try {
+      setIsSearching(true);
+      const results = await searchProducts(searchQuery);
+      setSearchResults(results);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(false);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    if (query.trim()) {
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          setIsSearching(true);
+          const results = await searchProducts(query);
+          setSearchResults(results);
+        } catch (error) {
+          console.error("Search error:", error);
+        } finally {
+          setIsSearching(false);
+        }
+      }, 300); // 300ms delay
+    } else {
+      setSearchResults([]);
+    }
   };
 
   const handleLogoClick = () => {
@@ -307,7 +353,7 @@ const NavbarComponent = () => {
                 <input
                   type="search"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchInputChange}
                   placeholder="Search products..."
                   className="w-full p-4 pl-12 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-dun focus:border-dun dark:bg-gray-800/50 dark:border-gray-700 dark:text-white transition-all duration-200"
                   autoFocus
@@ -318,11 +364,30 @@ const NavbarComponent = () => {
 
             {/* Search Results */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
-              {/* Add your search results here */}
+              {isSearching ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-dun"></div>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {searchResults.map((product) => (
+                    <div
+                      key={product.id}
+                      className="transform transition duration-300 hover:translate-y-[-5px]"
+                    >
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
+              ) : searchQuery.trim() ? (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  No products found matching your search.
+                </div>
+              ) : null}
             </div>
 
             {/* View All Results Button */}
-            {searchQuery && (
+            {searchQuery.trim() && (
               <div className="p-6 border-t dark:border-gray-700/50">
                 <button
                   onClick={handleSearch}

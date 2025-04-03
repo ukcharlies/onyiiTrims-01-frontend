@@ -1,62 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useGlobal } from "../context/GlobalContext";
+import { getUserOrders } from "../services/api";
 
 const Orders = () => {
-  const { user } = useGlobal();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching orders from an API
-    setTimeout(() => {
-      // Mock order data - in a real app, this would come from your API
-      const mockOrders = [
-        {
-          id: "ORD-001",
-          date: "2023-09-15",
-          status: "Delivered",
-          total: 125.99,
-          items: [
-            {
-              id: "1",
-              name: "Premium Hair Extension",
-              quantity: 2,
-              price: 49.99,
-            },
-            { id: "2", name: "Styling Comb Set", quantity: 1, price: 26.01 },
-          ],
-        },
-        {
-          id: "ORD-002",
-          date: "2023-10-02",
-          status: "Processing",
-          total: 79.5,
-          items: [
-            { id: "3", name: "Hair Styling Brush", quantity: 1, price: 35.5 },
-            {
-              id: "4",
-              name: "Hair Clips (Pack of 12)",
-              quantity: 2,
-              price: 22.0,
-            },
-          ],
-        },
-        {
-          id: "ORD-003",
-          date: "2023-10-18",
-          status: "Shipped",
-          total: 215.25,
-          items: [
-            { id: "5", name: "Premium Wig", quantity: 1, price: 199.99 },
-            { id: "6", name: "Wig Styling Kit", quantity: 1, price: 15.26 },
-          ],
-        },
-      ];
+    const fetchOrders = async () => {
+      try {
+        const response = await getUserOrders();
+        setOrders(response);
+      } catch (err) {
+        setError("Failed to fetch orders");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setOrders(mockOrders);
-      setLoading(false);
-    }, 1000);
+    fetchOrders();
   }, []);
 
   return (
@@ -104,14 +67,16 @@ const Orders = () => {
               <tbody>
                 {orders.map((order) => (
                   <tr key={order.id} className="border-b border-gray-200">
-                    <td className="py-3 px-4">{order.id}</td>
-                    <td className="py-3 px-4">{order.date}</td>
+                    <td className="py-3 px-4">{order.orderNumber}</td>
+                    <td className="py-3 px-4">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-2 py-1 rounded text-xs ${
-                          order.status === "Delivered"
+                          order.status === "DELIVERED"
                             ? "bg-green-100 text-green-800"
-                            : order.status === "Shipped"
+                            : order.status === "SHIPPED"
                             ? "bg-blue-100 text-blue-800"
                             : "bg-yellow-100 text-yellow-800"
                         }`}
@@ -119,7 +84,9 @@ const Orders = () => {
                         {order.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4">₦{order.total.toFixed(2)}</td>
+                    <td className="py-3 px-4">
+                      ₦{Number(order.totalAmount).toFixed(2)}
+                    </td>
                     <td className="py-3 px-4">
                       <Link
                         to={`/orders/${order.id}`}

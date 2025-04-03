@@ -1,11 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { getUserOrders } from "../services/api";
 
 const Dashboard = () => {
   const { user } = useGlobal();
   const { cartItems, getCartTotal } = useCart();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const userOrders = await getUserOrders();
+        setOrders(userOrders);
+      } catch (err) {
+        setError("Failed to fetch orders");
+        console.error("Error fetching orders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   // Function to open cart drawer
   const openCartDrawer = () => {
@@ -16,41 +36,42 @@ const Dashboard = () => {
     }
   };
 
-  // Mock order data
-  const recentOrders = [
-    { id: "ORD-001", date: "2023-09-15", status: "Delivered", total: 125.99 },
-    { id: "ORD-002", date: "2023-10-02", status: "Processing", total: 79.5 },
-    { id: "ORD-003", date: "2023-10-18", status: "Shipped", total: 215.25 },
-  ];
-
   return (
     <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">
+        Dashboard
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* User Info Card */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             Welcome Back, {user?.firstName}
           </h2>
-          <p className="text-gray-600 mb-2">
+          <p className="text-gray-600 dark:text-gray-300 mb-2">
             Name: {user?.firstName} {user?.lastName}
           </p>
-          <p className="text-gray-600 mb-4">Email: {user?.email}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Email: {user?.email}
+          </p>
           <Link
             to="/profile"
-            className="text-dun hover:underline transition-colors"
+            className="text-dun dark:text-[#607466] hover:underline transition-colors"
           >
             View Profile
           </Link>
         </div>
 
         {/* Cart Summary Card */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Cart Summary</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+            Cart Summary
+          </h2>
 
           {cartItems.length === 0 ? (
-            <p className="text-gray-500 mb-4">Your cart is empty.</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Your cart is empty.
+            </p>
           ) : (
             <>
               <div className="max-h-40 overflow-y-auto mb-3">
@@ -59,18 +80,18 @@ const Dashboard = () => {
                     key={index}
                     className="flex justify-between items-center mb-2 text-sm"
                   >
-                    <div className="flex-1 truncate">
+                    <div className="flex-1 truncate text-gray-700 dark:text-gray-300">
                       <span className="font-medium">{item.quantity}x</span>{" "}
                       {item.name}
                     </div>
-                    <div className="pl-2 text-gray-700">
+                    <div className="pl-2 text-gray-700 dark:text-gray-300">
                       ₦{(item.price * item.quantity).toFixed(2)}
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-gray-200 pt-2 mb-3">
-                <p className="text-lg font-medium flex justify-between">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mb-3">
+                <p className="text-lg font-medium flex justify-between text-gray-800 dark:text-white">
                   <span>Total:</span>
                   <span>₦{getCartTotal().toFixed(2)}</span>
                 </p>
@@ -83,7 +104,7 @@ const Dashboard = () => {
               <>
                 <button
                   onClick={openCartDrawer}
-                  className="inline-block px-4 py-2 bg-dun text-white rounded hover:bg-dun/90 transition-colors"
+                  className="inline-block px-4 py-2 bg-dun dark:bg-[#607466] text-white rounded hover:bg-dun/90 dark:hover:bg-[#607466]/90 transition-colors"
                 >
                   View Cart
                 </button>
@@ -99,64 +120,112 @@ const Dashboard = () => {
         </div>
 
         {/* Order Summary Card */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-          <p className="mb-2">Total Orders: {recentOrders.length}</p>
-          <p className="mb-4">Last Order: {recentOrders[0]?.date}</p>
-          <Link
-            to="/orders"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            View All Orders
-          </Link>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+            Order Summary
+          </h2>
+          {loading ? (
+            <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <>
+              <p className="mb-2 text-gray-600 dark:text-gray-300">
+                Total Orders: {orders.length}
+              </p>
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
+                Last Order:{" "}
+                {orders.length > 0
+                  ? new Date(orders[0].createdAt).toLocaleDateString()
+                  : "No orders yet"}
+              </p>
+              <Link
+                to="/orders"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+              >
+                View All Orders
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+          Recent Orders
+        </h2>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-3 px-4 text-left">Order ID</th>
-                <th className="py-3 px-4 text-left">Date</th>
-                <th className="py-3 px-4 text-left">Status</th>
-                <th className="py-3 px-4 text-left">Total</th>
-                <th className="py-3 px-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order.id} className="border-b border-gray-200">
-                  <td className="py-3 px-4">{order.id}</td>
-                  <td className="py-3 px-4">{order.date}</td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        order.status === "Delivered"
-                          ? "bg-green-100 text-green-800"
-                          : order.status === "Shipped"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">₦{order.total.toFixed(2)}</td>
-                  <td className="py-3 px-4">
-                    <Link
-                      to={`/orders/${order.id}`}
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      View
-                    </Link>
-                  </td>
+          {loading ? (
+            <p className="text-gray-600 dark:text-gray-300">
+              Loading orders...
+            </p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : orders.length === 0 ? (
+            <p className="text-gray-600 dark:text-gray-300">No orders found</p>
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-700">
+                  <th className="py-3 px-4 text-left text-gray-800 dark:text-white">
+                    Order Number
+                  </th>
+                  <th className="py-3 px-4 text-left text-gray-800 dark:text-white">
+                    Date
+                  </th>
+                  <th className="py-3 px-4 text-left text-gray-800 dark:text-white">
+                    Status
+                  </th>
+                  <th className="py-3 px-4 text-left text-gray-800 dark:text-white">
+                    Total
+                  </th>
+                  <th className="py-3 px-4 text-left text-gray-800 dark:text-white">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {orders.slice(0, 5).map((order) => (
+                  <tr
+                    key={order.id}
+                    className="border-b border-gray-200 dark:border-gray-700"
+                  >
+                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
+                      {order.orderNumber}
+                    </td>
+                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          order.status === "DELIVERED"
+                            ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                            : order.status === "SHIPPED"
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                            : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
+                      ₦{Number(order.totalAmount).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <Link
+                        to={`/orders/${order.id}`}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

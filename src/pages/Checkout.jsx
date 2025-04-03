@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useGlobal } from "../context/GlobalContext";
 import { HiArrowLeft, HiShieldCheck } from "react-icons/hi";
+import FlutterPay from "../components/FlutterPay";
+import { createOrder } from "../services/api";
 
 const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { user } = useGlobal();
+  const { user, updateUser } = useGlobal();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
+    phoneNumber: user?.phoneNumber || "", // Add this line
     address: "",
     city: "",
     state: "",
@@ -20,6 +23,17 @@ const Checkout = () => {
     paymentMethod: "card",
   });
   const [loading, setLoading] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,39 +43,71 @@ const Checkout = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const calculateTotal = () => {
+    return cartItems.reduce(
+      (sum, item) => sum + (item?.price || 0) * (item?.quantity || 0),
+      0
+    );
+  };
 
-    // Simulate order processing
-    setTimeout(() => {
-      // In a real app, you would send the order data to your backend
-      console.log("Order submitted:", {
-        customer: {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Update user profile with new address and phone
+      await updateUser({
+        phoneNumber: formData.phoneNumber,
+        address: formData.address,
+      });
+
+      // Create order data
+      const orderData = {
+        shippingDetails: {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-        },
-        shippingAddress: {
           address: formData.address,
           city: formData.city,
           state: formData.state,
           zipCode: formData.zipCode,
           country: formData.country,
         },
-        paymentMethod: formData.paymentMethod,
-        items: cartItems,
-        total: getCartTotal(),
-      });
+        paymentDetails: {
+          // Add this object
+          method: formData.paymentMethod,
+          transactionId: null, // This will be updated after payment
+        },
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      };
 
-      // Clear the cart
-      clearCart();
+      const response = await createOrder(orderData);
+      setOrder(response.order); // Store the entire order object
+      setOrderNumber(response.order.orderNumber);
 
-      // Navigate to a success page (you could create this next)
-      navigate("/checkout/success");
+      // Don't clear cart yet - wait for payment confirmation
+      setShippingAddress(formData.address);
+    } catch (error) {
+      setError("Failed to create order. Please try again.");
+      console.error("Order creation error:", error);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
+
+  // Move debug logging into useEffect
+  useEffect(() => {
+    console.log("Order State:", {
+      order,
+      orderNumber,
+      amount: calculateTotal(),
+    });
+  }, [order, orderNumber]); // Only log when order or orderNumber changes
 
   if (cartItems.length === 0) {
     return (
@@ -82,6 +128,10 @@ const Checkout = () => {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
       <div className="mb-6">
@@ -94,6 +144,12 @@ const Checkout = () => {
       </div>
 
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Order Summary */}
@@ -109,20 +165,20 @@ const Checkout = () => {
                 >
                   <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden">
                     <img
-                      src={item.image || "/images/product-placeholder.jpg"}
-                      alt={item.name}
+                      src={item?.imageUrl || "/images/product-placeholder.jpg"}
+                      alt={item?.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="ml-4 flex-1">
-                    <h3 className="text-sm font-medium">{item.name}</h3>
+                    <h3 className="text-sm font-medium">{item?.name}</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Qty: {item.quantity}
+                      Qty: {item?.quantity}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      ₦{(item.price * item.quantity).toFixed(2)}
+                      ₦{(item?.price * item?.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -133,7 +189,7 @@ const Checkout = () => {
               <div className="flex justify-between py-2">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-medium">
-                  ₦{getCartTotal().toFixed(2)}
+                  ₦{calculateTotal().toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between py-2">
@@ -142,7 +198,7 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between py-2 text-lg font-bold">
                 <span>Total</span>
-                <span>₦{getCartTotal().toFixed(2)}</span>
+                <span>₦{calculateTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -214,6 +270,25 @@ const Checkout = () => {
                   id="email"
                   name="email"
                   value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dun"
+                />
+              </div>
+
+              {/* Add this phone number field after email field */}
+              <div className="mb-6">
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dun"
@@ -323,15 +398,15 @@ const Checkout = () => {
                 <div className="flex items-center mb-3">
                   <input
                     type="radio"
-                    id="card"
+                    id="creditCard"
                     name="paymentMethod"
-                    value="card"
+                    value="card" // This will be mapped to CREDIT_CARD in backend
                     checked={formData.paymentMethod === "card"}
                     onChange={handleChange}
                     className="h-4 w-4 text-dun focus:ring-dun"
                   />
                   <label
-                    htmlFor="card"
+                    htmlFor="creditCard"
                     className="ml-2 block text-sm font-medium text-gray-700"
                   >
                     Credit/Debit Card
@@ -416,6 +491,23 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Section - Only show after order is created */}
+      {order && (
+        <div className="mt-8">
+          <div className="border p-4 rounded-lg bg-white">
+            <h3 className="text-lg font-semibold mb-4">
+              Order Created Successfully!
+            </h3>
+            <p className="mb-4">Order Number: {orderNumber}</p>
+            <FlutterPay
+              amount={calculateTotal()}
+              orderNumber={orderNumber}
+              orderId={order.id}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

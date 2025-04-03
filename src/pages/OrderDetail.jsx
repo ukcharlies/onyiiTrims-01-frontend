@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { HiArrowLeft } from "react-icons/hi";
+import { getOrderDetails } from "../services/api"; // Make sure this import exists
 
 const OrderDetail = () => {
   const { orderId } = useParams();
@@ -10,114 +11,28 @@ const OrderDetail = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching order details from an API
-    setTimeout(() => {
-      // Mock order data based on orderId
-      // In a real app, this would be an API call to fetch the specific order
-      const mockOrders = {
-        "ORD-001": {
-          id: "ORD-001",
-          date: "2023-09-15",
-          status: "Delivered",
-          total: 125.99,
-          shippingAddress: {
-            name: "John Doe",
-            street: "123 Main St",
-            city: "New York",
-            state: "NY",
-            zip: "10001",
-            country: "USA",
-          },
-          paymentMethod: "Credit Card",
-          items: [
-            {
-              id: "1",
-              name: "Premium Hair Extension",
-              quantity: 2,
-              price: 49.99,
-              image: "/images/product-placeholder.jpg",
-            },
-            {
-              id: "2",
-              name: "Styling Comb Set",
-              quantity: 1,
-              price: 26.01,
-              image: "/images/product-placeholder.jpg",
-            },
-          ],
-        },
-        "ORD-002": {
-          id: "ORD-002",
-          date: "2023-10-02",
-          status: "Processing",
-          total: 79.5,
-          shippingAddress: {
-            name: "Jane Smith",
-            street: "456 Elm St",
-            city: "Los Angeles",
-            state: "CA",
-            zip: "90001",
-            country: "USA",
-          },
-          paymentMethod: "PayPal",
-          items: [
-            {
-              id: "3",
-              name: "Hair Styling Brush",
-              quantity: 1,
-              price: 35.5,
-              image: "/images/product-placeholder.jpg",
-            },
-            {
-              id: "4",
-              name: "Hair Clips (Pack of 12)",
-              quantity: 2,
-              price: 22.0,
-              image: "/images/product-placeholder.jpg",
-            },
-          ],
-        },
-        "ORD-003": {
-          id: "ORD-003",
-          date: "2023-10-18",
-          status: "Shipped",
-          total: 215.25,
-          shippingAddress: {
-            name: "Robert Johnson",
-            street: "789 Oak St",
-            city: "Chicago",
-            state: "IL",
-            zip: "60601",
-            country: "USA",
-          },
-          paymentMethod: "Credit Card",
-          items: [
-            {
-              id: "5",
-              name: "Premium Wig",
-              quantity: 1,
-              price: 199.99,
-              image: "/images/product-placeholder.jpg",
-            },
-            {
-              id: "6",
-              name: "Wig Styling Kit",
-              quantity: 1,
-              price: 15.26,
-              image: "/images/product-placeholder.jpg",
-            },
-          ],
-        },
-      };
+    const fetchOrderDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await getOrderDetails(orderId);
 
-      if (mockOrders[orderId]) {
-        setOrder(mockOrders[orderId]);
-        setLoading(false);
-      } else {
-        setError("Order not found");
+        if (!response.success) {
+          throw new Error(response.error || "Failed to fetch order");
+        }
+
+        setOrder(response.order);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching order:", err);
+        setError(err.message || "Failed to fetch order details");
+      } finally {
         setLoading(false);
       }
-    }, 1000);
+    };
+
+    if (orderId) {
+      fetchOrderDetails();
+    }
   }, [orderId]);
 
   if (loading) {
@@ -147,6 +62,25 @@ const OrderDetail = () => {
     );
   }
 
+  if (!order) {
+    return (
+      <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <h2 className="text-xl font-semibold mb-4">Order Not Found</h2>
+          <p className="text-gray-600 mb-6">
+            The requested order could not be found.
+          </p>
+          <Link
+            to="/orders"
+            className="px-6 py-3 bg-dun text-white rounded-md hover:bg-dun/90 transition-colors"
+          >
+            Back to Orders
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto max-w-6xl p-4 pt-36 md:pt-40">
       <div className="mb-6">
@@ -160,15 +94,19 @@ const OrderDetail = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start mb-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Order #{order.id}</h1>
-          <p className="text-gray-600">Placed on {order.date}</p>
+          <h1 className="text-3xl font-bold mb-2">
+            Order #{order.orderNumber}
+          </h1>
+          <p className="text-gray-600">
+            Placed on {new Date(order.date).toLocaleDateString()}
+          </p>
         </div>
         <div className="mt-4 md:mt-0">
           <span
             className={`px-3 py-1 rounded text-sm font-medium ${
-              order.status === "Delivered"
+              order.status === "DELIVERED"
                 ? "bg-green-100 text-green-800"
-                : order.status === "Shipped"
+                : order.status === "SHIPPED"
                 ? "bg-blue-100 text-blue-800"
                 : "bg-yellow-100 text-yellow-800"
             }`}
@@ -182,13 +120,21 @@ const OrderDetail = () => {
         {/* Shipping Info */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
-          <p className="text-gray-700 mb-1">{order.shippingAddress.name}</p>
-          <p className="text-gray-700 mb-1">{order.shippingAddress.street}</p>
-          <p className="text-gray-700 mb-1">
-            {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-            {order.shippingAddress.zip}
+          <p className="text-gray-700 whitespace-pre-line mb-2">
+            {order.shippingAddress.address}
           </p>
-          <p className="text-gray-700">{order.shippingAddress.country}</p>
+          <p className="text-gray-600">
+            Status:{" "}
+            <span className="font-medium">{order.shippingAddress.status}</span>
+          </p>
+          {order.shippingAddress.estimatedDelivery && (
+            <p className="text-gray-600 mt-2">
+              Estimated Delivery:{" "}
+              {new Date(
+                order.shippingAddress.estimatedDelivery
+              ).toLocaleDateString()}
+            </p>
+          )}
         </div>
 
         {/* Payment Info */}

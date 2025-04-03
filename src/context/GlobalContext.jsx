@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const GlobalContext = createContext();
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+export const useGlobal = () => useContext(GlobalContext);
+
 export const GlobalProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -207,12 +209,4 @@ export const GlobalProvider = ({ children }) => {
       {children}
     </GlobalContext.Provider>
   );
-};
-
-export const useGlobal = () => {
-  const context = useContext(GlobalContext);
-  if (!context) {
-    throw new Error("useGlobal must be used within a GlobalProvider");
-  }
-  return context;
 };
