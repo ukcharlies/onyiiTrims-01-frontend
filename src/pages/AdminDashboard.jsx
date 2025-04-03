@@ -9,6 +9,9 @@ import {
   updateOrderStatus,
   getAllProducts,
   createProduct,
+  deleteProduct, // Add this
+  getCategories, // Add this
+  getSubcategoriesByCategory, // Add this
 } from "../services/api";
 
 const AdminDashboard = () => {
@@ -18,7 +21,7 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
-    name: "", // Use double quotes
+    name: "",
     description: "",
     price: "",
     stock: "",
@@ -28,6 +31,9 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("users");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     // Check if user is admin
@@ -56,6 +62,32 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (selectedCategory) {
+        try {
+          const data = await getSubcategoriesByCategory(selectedCategory);
+          setSubcategories(data);
+        } catch (err) {
+          setError(err.message);
+        }
+      }
+    };
+    fetchSubcategories();
+  }, [selectedCategory]);
 
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
@@ -99,12 +131,9 @@ const AdminDashboard = () => {
     try {
       const formData = new FormData();
       Object.keys(newProduct).forEach((key) => {
-        // Add parentheses
         if (key === "images") {
-          // Use double quotes
           newProduct.images.forEach((image) => {
-            // Add parentheses
-            formData.append("images", image); // Use double quotes
+            formData.append("images", image);
           });
         } else {
           formData.append(key, newProduct[key]);
@@ -114,8 +143,7 @@ const AdminDashboard = () => {
       await createProduct(formData);
       fetchData(); // Refresh products list
       setNewProduct({
-        // Reset form
-        name: "", // Use double quotes
+        name: "",
         description: "",
         price: "",
         stock: "",
@@ -125,6 +153,21 @@ const AdminDashboard = () => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(productId);
+        setProducts(products.filter((product) => product.id !== productId));
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+  };
+
+  const handleEditProduct = (productId) => {
+    navigate(`/products/${productId}/edit`);
   };
 
   const handleViewOrderDetails = (orderId) => {
@@ -278,7 +321,7 @@ const AdminDashboard = () => {
                   value={newProduct.name}
                   onChange={(e) =>
                     setNewProduct({ ...newProduct, name: e.target.value })
-                  } // Add spaces inside curly braces
+                  }
                   className="w-full border rounded p-2"
                   required
                 />
@@ -290,7 +333,7 @@ const AdminDashboard = () => {
                   value={newProduct.price}
                   onChange={(e) =>
                     setNewProduct({ ...newProduct, price: e.target.value })
-                  } // Add spaces inside curly braces
+                  }
                   className="w-full border rounded p-2"
                   required
                 />
@@ -302,7 +345,7 @@ const AdminDashboard = () => {
                   value={newProduct.stock}
                   onChange={(e) =>
                     setNewProduct({ ...newProduct, stock: e.target.value })
-                  } // Add spaces inside curly braces
+                  }
                   className="w-full border rounded p-2"
                   required
                 />
@@ -317,11 +360,49 @@ const AdminDashboard = () => {
                       ...newProduct,
                       images: Array.from(e.target.files),
                     })
-                  } // Add spaces inside curly braces
+                  }
                   className="w-full border rounded p-2"
                   accept="image/*"
                   required
                 />
+              </div>
+              <div>
+                <label className="block mb-2">Category</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full border rounded p-2"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2">Subcategory</label>
+                <select
+                  value={newProduct.subcategoryId}
+                  onChange={(e) =>
+                    setNewProduct({
+                      ...newProduct,
+                      subcategoryId: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded p-2"
+                  required
+                  disabled={!selectedCategory}
+                >
+                  <option value="">Select Subcategory</option>
+                  {subcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="md:col-span-2">
                 <label className="block mb-2">Description</label>
@@ -332,7 +413,7 @@ const AdminDashboard = () => {
                       ...newProduct,
                       description: e.target.value,
                     })
-                  } // Add spaces inside curly braces
+                  }
                   className="w-full border rounded p-2"
                   rows="3"
                   required
@@ -366,7 +447,7 @@ const AdminDashboard = () => {
                     <td className="p-3">{product.stock}</td>
                     <td className="p-3">
                       <button
-                        onClick={() => navigate(`/products/${product.id}/edit`)}
+                        onClick={() => handleEditProduct(product.id)}
                         className="text-blue-600 hover:text-blue-800 mr-3"
                       >
                         Edit
@@ -389,4 +470,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboard; // Keep only one export statement

@@ -20,6 +20,7 @@ import CheckoutProtectedRoute from "./components/CheckoutProtectedRoute";
 import Shop from "./pages/Shop";
 import SearchResults from "./pages/SearchResults";
 import AdminDashboard from "./pages/AdminDashboard";
+import ProductEdit from "./pages/ProductEdit"; // Add this import
 
 // This component will fetch categories and redirect to the first one
 const CategoriesRedirect = () => {
@@ -84,6 +85,11 @@ const router = createBrowserRouter([
           {
             path: "orders/:orderId",
             element: <OrderDetail />,
+          },
+          // Add product edit route (must be admin)
+          {
+            path: "products/:productId/edit",
+            element: <ProductEdit />,
           },
         ],
       },

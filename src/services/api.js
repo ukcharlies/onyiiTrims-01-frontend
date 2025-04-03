@@ -1,22 +1,35 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-// Base fetch function with credentials
-const fetchWithCredentials = async (endpoint, options = {}) => {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    credentials: "include", // This ensures cookies are sent with requests
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
+// Add error handling wrapper
+const handleFetchError = async (response) => {
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Something went wrong");
+    const text = await response.text();
+    try {
+      const error = JSON.parse(text);
+      throw new Error(error.message || "API request failed");
+    } catch {
+      throw new Error(text || "API request failed");
+    }
   }
-
   return response.json();
+};
+
+// Update fetchWithCredentials
+const fetchWithCredentials = async (endpoint, options = {}) => {
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+    return handleFetchError(response);
+  } catch (error) {
+    console.error(`API Error (${endpoint}):`, error);
+    throw error;
+  }
 };
 
 // Search products
@@ -116,6 +129,21 @@ export const getProductsBySubcategory = async (subcategoryId) => {
     console.error("Get products by subcategory error:", error);
     throw error;
   }
+};
+
+// Get all categories
+export const getCategories = async () => {
+  return fetchWithCredentials("/api/categories");
+};
+
+// Get subcategories by category
+export const getSubcategoriesByCategory = async (categoryId) => {
+  return fetchWithCredentials(`/api/subcategories/category/${categoryId}`);
+};
+
+// Get subcategory by ID
+export const getSubcategoryById = async (subcategoryId) => {
+  return fetchWithCredentials(`/api/subcategories/${subcategoryId}`);
 };
 
 // Create product
