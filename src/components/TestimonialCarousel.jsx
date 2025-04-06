@@ -9,7 +9,7 @@ const testimonials = [
     author: "Adeola Martins",
     position: "Tailor & Fashion Designer",
     rating: 5,
-    image: "https://randomuser.me/api/portraits/women/23.jpg",
+    image: "https://randomuser.me/api/portraits/men/55.jpg",
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ const testimonials = [
     author: "Fatima Bello",
     position: "Bridal Stylist",
     rating: 4,
-    image: "https://randomuser.me/api/portraits/women/45.jpg",
+    image: "https://randomuser.me/api/portraits/women/36.jpg",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const testimonials = [
     author: "Segun Adesanya",
     position: "Master Tailor",
     rating: 5,
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
+    image: "https://randomuser.me/api/portraits/men/59.jpg",
   },
   {
     id: 5,
@@ -45,7 +45,7 @@ const testimonials = [
     author: "Aisha Yusuf",
     position: "Ready-to-Wear Designer",
     rating: 5,
-    image: "https://randomuser.me/api/portraits/women/67.jpg",
+    image: "https://randomuser.me/api/portraits/women/16.jpg",
   },
 ];
 
