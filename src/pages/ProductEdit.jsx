@@ -22,6 +22,8 @@ const ProductEdit = () => {
     stock: "",
     subcategoryId: "",
     images: [],
+    isHotBuy: false,
+    isNewlyAdded: false,
   });
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
@@ -91,12 +93,19 @@ const ProductEdit = () => {
     try {
       const formData = new FormData();
 
-      // Add basic fields
+      // Add basic fields with proper type conversions
       formData.append("name", product.name);
       formData.append("description", product.description);
-      formData.append("price", product.price);
-      formData.append("stock", product.stock);
+      formData.append("price", Number(product.price));
+      formData.append("stock", parseInt(product.stock, 10));
       formData.append("subcategoryId", product.subcategoryId);
+      formData.append("isHotBuy", String(product.isHotBuy));
+      formData.append("isNewlyAdded", String(product.isNewlyAdded));
+
+      // Handle existing images
+      if (product.images?.length) {
+        formData.append("existingImages", JSON.stringify(product.images));
+      }
 
       // Add new images if any were selected
       if (product.newImages) {
@@ -256,6 +265,39 @@ const ProductEdit = () => {
               </div>
             </div>
           )}
+
+          {/* Add these checkboxes before the Submit Buttons */}
+          <div className="flex gap-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isHotBuy"
+                checked={product.isHotBuy}
+                onChange={(e) =>
+                  setProduct({ ...product, isHotBuy: e.target.checked })
+                }
+                className="w-4 h-4 text-dun border-gray-300 rounded focus:ring-dun"
+              />
+              <label htmlFor="isHotBuy" className="ml-2 text-gray-700">
+                Hot Buy Product
+              </label>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isNewlyAdded"
+                checked={product.isNewlyAdded}
+                onChange={(e) =>
+                  setProduct({ ...product, isNewlyAdded: e.target.checked })
+                }
+                className="w-4 h-4 text-dun border-gray-300 rounded focus:ring-dun"
+              />
+              <label htmlFor="isNewlyAdded" className="ml-2 text-gray-700">
+                Newly Added Product
+              </label>
+            </div>
+          </div>
 
           {/* Submit Buttons */}
           <div className="flex gap-4">

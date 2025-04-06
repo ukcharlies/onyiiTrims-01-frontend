@@ -44,15 +44,16 @@ const ProductCard = ({ product, onAddToCart, darkMode = false }) => {
 
   return (
     <div
-      className={`${cardBgClass} rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}
+      className={`${cardBgClass} rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer w-[280px]`}
       onClick={handleCardClick}
     >
       {/* Product Image */}
-      <div className="relative h-56 bg-gray-100">
+      <div className="relative w-full h-[280px] bg-gray-100">
         <img
           src={images?.[0] || fallbackImage}
           alt={name}
-          className="w-full h-full object-contain" // Changed from object-cover to object-contain
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center" }}
           onError={(e) => {
             console.log("Image load error:", e);
             e.target.src = fallbackImage;
@@ -72,26 +73,26 @@ const ProductCard = ({ product, onAddToCart, darkMode = false }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-4">
-        <h3
-          className={`text-lg font-medium ${textClass} ${hoverTextClass} transition-colors duration-200 mb-1 truncate`}
-        >
-          {name}
-        </h3>
+      <div className="p-4 h-[160px] flex flex-col justify-between">
+        <div>
+          <h3
+            className={`text-lg font-medium ${textClass} ${hoverTextClass} transition-colors duration-200 mb-1 truncate`}
+          >
+            {name}
+          </h3>
 
-        <p
-          className={`${textSecondaryClass} text-sm mb-3 line-clamp-2`}
-          title={description}
-        >
-          {description}
-        </p>
+          <p
+            className={`${textSecondaryClass} text-sm mb-3 line-clamp-2`}
+            title={description}
+          >
+            {description}
+          </p>
+        </div>
 
-        <div className="flex items-center justify-between">
-          <div className="mt-1">
-            <p className="text-lg font-medium">
-              {price ? formatPrice(price) : "₦0.00"}
-            </p>
-          </div>
+        <div className="mt-1">
+          <p className="text-lg font-medium">
+            {price ? formatPrice(price) : "₦0.00"}
+          </p>
         </div>
       </div>
     </div>
