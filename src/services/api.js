@@ -148,18 +148,27 @@ export const getSubcategoryById = async (subcategoryId) => {
 
 // Create product
 export const createProduct = async (productData) => {
-  const response = await fetch(`${API_URL}/api/products`, {
-    method: "POST",
-    credentials: "include",
-    body: productData, // FormData object for file upload
-  });
+  try {
+    console.log("Sending product data:", productData);
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to create product");
+    const response = await fetch(`${API_URL}/api/products`, {
+      method: "POST",
+      credentials: "include",
+      // Do not set Content-Type for FormData
+      body: productData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Server error:", errorData);
+      throw new Error(errorData.message || "Failed to create product");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Create product error:", error);
+    throw error;
   }
-
-  return response.json();
 };
 
 // Delete product

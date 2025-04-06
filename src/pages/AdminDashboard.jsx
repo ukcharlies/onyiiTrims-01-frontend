@@ -130,18 +130,27 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      Object.keys(newProduct).forEach((key) => {
-        if (key === "images") {
-          newProduct.images.forEach((image) => {
-            formData.append("images", image);
-          });
-        } else {
-          formData.append(key, newProduct[key]);
-        }
-      });
 
-      await createProduct(formData);
-      fetchData(); // Refresh products list
+      // Add basic fields
+      formData.append("name", newProduct.name);
+      formData.append("description", newProduct.description);
+      formData.append("price", newProduct.price);
+      formData.append("stock", newProduct.stock);
+      formData.append("subcategoryId", newProduct.subcategoryId);
+
+      // Add images
+      if (newProduct.images && newProduct.images.length > 0) {
+        Array.from(newProduct.images).forEach((image) => {
+          formData.append("images", image);
+        });
+      }
+
+      const response = await createProduct(formData);
+      console.log("Product created:", response);
+
+      await fetchData(); // Refresh products list
+
+      // Reset form
       setNewProduct({
         name: "",
         description: "",
@@ -151,6 +160,7 @@ const AdminDashboard = () => {
         images: [],
       });
     } catch (err) {
+      console.error("Error creating product:", err);
       setError(err.message);
     }
   };

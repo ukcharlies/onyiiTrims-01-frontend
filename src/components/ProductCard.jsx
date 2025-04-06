@@ -50,10 +50,11 @@ const ProductCard = ({ product, onAddToCart, darkMode = false }) => {
       {/* Product Image */}
       <div className="relative h-56 bg-gray-100">
         <img
-          src={images && images.length > 0 ? images[0] : fallbackImage}
+          src={images?.[0] || fallbackImage}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain" // Changed from object-cover to object-contain
           onError={(e) => {
+            console.log("Image load error:", e);
             e.target.src = fallbackImage;
           }}
         />
