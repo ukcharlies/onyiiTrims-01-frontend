@@ -30,10 +30,10 @@ const Footer = () => {
 
   const resourceItems = [
     { to: "/faq", text: "FAQ" },
-    { to: "/terms", text: "Terms of Service" },
-    { to: "/privacy", text: "Privacy Policy" },
-    { to: "/shipping", text: "Shipping Policy" },
-    { to: "/refund", text: "Refund Policy" },
+    { to: "/terms-of-service", text: "Terms of Service" },
+    { to: "/privacy-policy", text: "Privacy Policy" },
+    { to: "/shipping-policy", text: "Shipping Policy" },
+    { to: "/refund-policy", text: "Refund Policy" },
   ];
 
   return (
