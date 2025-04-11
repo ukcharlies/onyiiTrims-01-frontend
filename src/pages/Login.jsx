@@ -177,6 +177,12 @@ const Login = () => {
                 {errors.password.message}
               </p>
             )}
+            <Link
+              to="/forgot-password"
+              className="block mt-2 text-sm text-dun hover:underline text-right"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button

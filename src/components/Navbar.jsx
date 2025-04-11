@@ -48,6 +48,11 @@ const NavbarComponent = () => {
     "/shop",
     "/order",
     "/admin",
+    "/refund-policy",
+    "/shipping-policy",
+    "/privacy-policy",
+    "/terms-of-service",
+    "/faq",
   ];
   const shouldAlwaysBeColored = coloredNavPages.some((page) =>
     location.pathname.startsWith(page)

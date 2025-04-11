@@ -48,38 +48,22 @@ const Contact = () => {
     try {
       setSubmitStatus(null);
 
-      // 1. Send notification to business
-      const businessTemplateParams = {
-        from_name: data.fullname,
-        from_email: data.email,
-        subject: data.subject,
-        message: data.message,
-        to_name: "Onyi Trims Team", // Add your business name
-      };
-
-      // 2. Send auto-reply to customer
-      const customerTemplateParams = {
+      // Send email to customer using business template
+      const templateParams = {
         to_name: data.fullname,
         to_email: data.email,
-        subject: "Thank you for contacting Onyi Trims",
+        from_name: "Onyi Trims Team",
+        subject: "Thank you for contacting Onyi Trims 💌",
         message: data.message,
       };
 
-      // Send email to business
-      const businessResult = await emailjs.send(
+      const result = await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID_BUSINESS, // New template ID for business
-        businessTemplateParams
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID_BUSINESS,
+        templateParams
       );
 
-      // Send auto-reply to customer
-      const customerResult = await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CUSTOMER, // New template ID for customer
-        customerTemplateParams
-      );
-
-      if (businessResult.status === 200 && customerResult.status === 200) {
+      if (result.status === 200) {
         setSubmitStatus("success");
         toast.success(
           "Message sent successfully! Please check your email for confirmation."
@@ -276,16 +260,16 @@ const Contact = () => {
                         darkMode ? "text-gray-300" : "text-gray-700"
                       } mb-3`}
                     >
-                      123 Fashion Avenue
+                      30 Araromi Street,
                       <br />
-                      Suite 456
+                      Shop 456
                       <br />
                       Oshodi,
                       <br />
                       Lagos States
                     </p>
                     <a
-                      href="https://www.google.com/maps?q=6.527722050714314, 3.3119572169077633" // Replace with actual coordinates
+                      href="https://www.google.com/maps?q=6.557432451341992, 3.3493876878000566" // Replace with actual coordinates
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center ${
@@ -412,7 +396,7 @@ const Contact = () => {
               >
                 <iframe
                   title="Onyi Trims Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.7493957071765!2d3.309768476272725!3d6.527722050714314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzEnMzkuOCJOIDPCsDE4JzQzLjAiRQ!5e0!3m2!1sen!2sng!4v1624987654321!5m2!1sen!2sng"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.7493957071765!2d3.3493856830511404!3d6.55744041787657!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzMnMjYuOCJOIDPCsDIwJzU3LjgiRQ!5e0!3m2!1sen!2sng!4v1624987654321!5m2!1sen!2sng"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

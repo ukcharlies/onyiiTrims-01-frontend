@@ -21,6 +21,13 @@ import Shop from "./pages/Shop";
 import SearchResults from "./pages/SearchResults";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductEdit from "./pages/ProductEdit"; // Add this import
+import FAQ from "./pages/FAQ";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // This component will fetch categories and redirect to the first one
 const CategoriesRedirect = () => {
@@ -59,6 +66,14 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <Register />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
       },
       // Protected routes that require authentication
       {
@@ -135,6 +150,26 @@ const router = createBrowserRouter([
       {
         path: "order/failed",
         element: <OrderFailed />,
+      },
+      {
+        path: "faq",
+        element: <FAQ />,
+      },
+      {
+        path: "terms-of-service",
+        element: <TermsOfService />,
+      },
+      {
+        path: "privacy-policy",
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: "shipping-policy",
+        element: <ShippingPolicy />,
+      },
+      {
+        path: "refund-policy",
+        element: <RefundPolicy />,
       },
       { path: "*", element: <Navigate to="/" replace /> },
     ],

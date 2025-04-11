@@ -191,6 +191,54 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  const requestPasswordReset = async (email) => {
+    try {
+      const response = await fetch(`${API_URL}/api/users/request-reset`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      return {
+        success: response.ok,
+        message: data.message,
+      };
+    } catch (error) {
+      console.error("Password reset request error:", error);
+      return {
+        success: false,
+        message: "An error occurred during password reset request",
+      };
+    }
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    try {
+      const response = await fetch(`${API_URL}/api/users/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp, newPassword }),
+      });
+
+      const data = await response.json();
+      return {
+        success: response.ok,
+        message: data.message,
+      };
+    } catch (error) {
+      console.error("Password reset error:", error);
+      return {
+        success: false,
+        message: "An error occurred during password reset",
+      };
+    }
+  };
+
   const contextValue = {
     user,
     isAuthenticated,
@@ -202,6 +250,8 @@ export const GlobalProvider = ({ children }) => {
     apiUrl: API_URL,
     darkMode,
     toggleDarkMode,
+    requestPasswordReset,
+    resetPassword,
   };
 
   return (
