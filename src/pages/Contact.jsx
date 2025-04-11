@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   HiMail,
@@ -15,9 +15,85 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { useGlobal } from "../context/GlobalContext";
+import { useForm } from "react-hook-form";
+import emailjs from "@emailjs/browser";
+import { toast } from "react-toastify";
 
 const Contact = () => {
   const { darkMode } = useGlobal();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      fullname: "",
+      email: "",
+      subject: "",
+      message: "",
+      privacyPolicy: false,
+    },
+  });
+
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  useEffect(() => {
+    // Initialize EmailJS with your public key
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+  }, []);
+
+  // Email submission handler
+  const onSubmit = async (data) => {
+    try {
+      setSubmitStatus(null);
+
+      // 1. Send notification to business
+      const businessTemplateParams = {
+        from_name: data.fullname,
+        from_email: data.email,
+        subject: data.subject,
+        message: data.message,
+        to_name: "Onyi Trims Team", // Add your business name
+      };
+
+      // 2. Send auto-reply to customer
+      const customerTemplateParams = {
+        to_name: data.fullname,
+        to_email: data.email,
+        subject: "Thank you for contacting Onyi Trims",
+        message: data.message,
+      };
+
+      // Send email to business
+      const businessResult = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID_BUSINESS, // New template ID for business
+        businessTemplateParams
+      );
+
+      // Send auto-reply to customer
+      const customerResult = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID_CUSTOMER, // New template ID for customer
+        customerTemplateParams
+      );
+
+      if (businessResult.status === 200 && customerResult.status === 200) {
+        setSubmitStatus("success");
+        toast.success(
+          "Message sent successfully! Please check your email for confirmation."
+        );
+        reset();
+      } else {
+        throw new Error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Email error:", error);
+      setSubmitStatus("error");
+      toast.error("Failed to send message. Please try again.");
+    }
+  };
 
   // Handler for image error
   const handleImageError = (e) => {
@@ -150,12 +226,12 @@ const Contact = () => {
                       Main Office:
                     </p>
                     <a
-                      href="tel:+12345678900"
+                      href="tel:08110462137"
                       className={`${
                         darkMode ? "text-[#607466]" : "text-dun"
                       } hover:underline`}
                     >
-                      +1 (234) 567-8900
+                      081 104-62137
                     </a>
                     <p
                       className={`${
@@ -165,12 +241,12 @@ const Contact = () => {
                       Customer Service:
                     </p>
                     <a
-                      href="tel:+12345678901"
+                      href="tel:+2347063165518"
                       className={`${
                         darkMode ? "text-[#607466]" : "text-dun"
                       } hover:underline`}
                     >
-                      +1 (234) 567-8901
+                      +234 706 316 5518
                     </a>
                   </div>
                 </div>
@@ -204,12 +280,12 @@ const Contact = () => {
                       <br />
                       Suite 456
                       <br />
-                      New York, NY 10001
+                      Oshodi,
                       <br />
-                      United States
+                      Lagos States
                     </p>
                     <a
-                      href="https://maps.google.com"
+                      href="https://www.google.com/maps?q=6.527722050714314, 3.3119572169077633" // Replace with actual coordinates
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`inline-flex items-center ${
@@ -247,11 +323,11 @@ const Contact = () => {
                       }`}
                     >
                       <p>Monday - Friday:</p>
-                      <p>9:00 AM - 7:00 PM</p>
+                      <p>8:00 AM - 6:00 PM</p>
                       <p>Saturday:</p>
                       <p>10:00 AM - 6:00 PM</p>
                       <p>Sunday:</p>
-                      <p>11:00 AM - 5:00 PM</p>
+                      <p>Online services only</p>
                     </div>
                   </div>
                 </div>
@@ -322,7 +398,7 @@ const Contact = () => {
             <div>
               <div className="rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/images/store-location.jpg"
+                  src="/images/shop-location.jpg"
                   alt="Our Store"
                   className="w-full h-auto"
                   onError={handleImageError}
@@ -334,16 +410,16 @@ const Contact = () => {
                   darkMode ? "bg-gray-700" : "bg-gray-200"
                 }`}
               >
-                {/* Replace with actual Google Maps embed */}
-                <div className="w-full h-full flex items-center justify-center">
-                  <p
-                    className={`${
-                      darkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    Map Location
-                  </p>
-                </div>
+                <iframe
+                  title="Onyi Trims Location"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.7493957071765!2d3.309768476272725!3d6.527722050714314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzEnMzkuOCJOIDPCsDE4JzQzLjAiRQ!5e0!3m2!1sen!2sng!4v1624987654321!5m2!1sen!2sng"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </div>
           </div>
@@ -454,7 +530,19 @@ const Contact = () => {
             Send Us a Message
           </h2>
 
-          <form className="space-y-6">
+          {submitStatus === "success" && (
+            <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-md">
+              Thank you for your message! We'll get back to you soon.
+            </div>
+          )}
+
+          {submitStatus === "error" && (
+            <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">
+              Sorry, there was an error sending your message. Please try again.
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label
@@ -468,14 +556,26 @@ const Contact = () => {
                 <input
                   type="text"
                   id="fullname"
-                  name="fullname"
                   className={`w-full px-4 py-3 rounded-md border ${
+                    errors.fullname ? "border-red-500" : ""
+                  } ${
                     darkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300"
-                  } focus:outline-none focus:ring-2 focus:ring-dun focus:border-dun`}
-                  required
+                  }`}
+                  {...register("fullname", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
                 />
+                {errors.fullname && (
+                  <p className="mt-1 text-red-500 text-sm">
+                    {errors.fullname.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -490,14 +590,26 @@ const Contact = () => {
                 <input
                   type="email"
                   id="email"
-                  name="email"
                   className={`w-full px-4 py-3 rounded-md border ${
+                    errors.email ? "border-red-500" : ""
+                  } ${
                     darkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300"
-                  } focus:outline-none focus:ring-2 focus:ring-dun focus:border-dun`}
-                  required
+                  }`}
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-red-500 text-sm">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -513,12 +625,12 @@ const Contact = () => {
               <input
                 type="text"
                 id="subject"
-                name="subject"
                 className={`w-full px-4 py-3 rounded-md border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 text-white"
                     : "bg-white border-gray-300"
-                } focus:outline-none focus:ring-2 focus:ring-dun focus:border-dun`}
+                }`}
+                {...register("subject")}
               />
             </div>
 
@@ -533,27 +645,40 @@ const Contact = () => {
               </label>
               <textarea
                 id="message"
-                name="message"
                 rows="6"
                 className={`w-full px-4 py-3 rounded-md border ${
+                  errors.message ? "border-red-500" : ""
+                } ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 text-white"
                     : "bg-white border-gray-300"
-                } focus:outline-none focus:ring-2 focus:ring-dun focus:border-dun`}
-                required
+                }`}
+                {...register("message", {
+                  required: "Message is required",
+                  minLength: {
+                    value: 10,
+                    message: "Message must be at least 10 characters",
+                  },
+                })}
               ></textarea>
+              {errors.message && (
+                <p className="mt-1 text-red-500 text-sm">
+                  {errors.message.message}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center">
               <input
                 type="checkbox"
-                id="privacy-policy"
-                name="privacy-policy"
+                id="privacyPolicy"
                 className="mr-2"
-                required
+                {...register("privacyPolicy", {
+                  required: "You must agree to the Privacy Policy",
+                })}
               />
               <label
-                htmlFor="privacy-policy"
+                htmlFor="privacyPolicy"
                 className={`text-sm ${
                   darkMode ? "text-gray-300" : "text-gray-700"
                 }`}
@@ -568,16 +693,24 @@ const Contact = () => {
                   Privacy Policy
                 </Link>
               </label>
+              {errors.privacyPolicy && (
+                <p className="ml-2 text-red-500 text-sm">
+                  {errors.privacyPolicy.message}
+                </p>
+              )}
             </div>
 
             <div className="text-center">
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className={`inline-block ${
                   darkMode ? "bg-[#607466]" : "bg-dun"
-                } hover:opacity-90 text-white px-8 py-3 rounded-md font-medium transition-colors duration-300`}
+                } hover:opacity-90 text-white px-8 py-3 rounded-md font-medium transition-colors duration-300 ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Submit Message
+                {isSubmitting ? "Sending..." : "Submit Message"}
               </button>
             </div>
           </form>

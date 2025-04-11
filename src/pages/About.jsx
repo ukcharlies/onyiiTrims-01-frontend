@@ -265,7 +265,7 @@ const About = () => {
                   </div>
                 )}
                 <img
-                  src="/images/team-founder.jpg"
+                  src="/images/MadamPAt.png"
                   alt="Ukachi Onyinyechi"
                   className={`w-full h-full object-cover ${
                     imagesLoaded.team1 ? "opacity-100" : "opacity-0"
@@ -306,7 +306,7 @@ const About = () => {
                   </div>
                 )}
                 <img
-                  src="/images/team-design.jpg"
+                  src="/images/clear logo.png"
                   alt="6ix theDev"
                   className={`w-full h-full object-cover ${
                     imagesLoaded.team2 ? "opacity-100" : "opacity-0"
