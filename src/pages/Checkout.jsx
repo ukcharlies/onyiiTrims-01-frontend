@@ -29,6 +29,13 @@ const Checkout = () => {
   const [error, setError] = useState(null);
   const [order, setOrder] = useState(null);
 
+  // Update delivery method state with pickup option
+  const [deliveryMethod, setDeliveryMethod] = useState("standard");
+
+  const STANDARD_MINIMUM = 20000;
+  const REGULAR_FEE = 1000;
+  const EXPRESS_FEE = 5000;
+
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -43,7 +50,26 @@ const Checkout = () => {
     }));
   };
 
+  // Modify the calculateTotal function
   const calculateTotal = () => {
+    const itemsTotal = cartItems.reduce(
+      (sum, item) => sum + (item?.price || 0) * (item?.quantity || 0),
+      0
+    );
+
+    const shippingFee =
+      deliveryMethod === "express"
+        ? EXPRESS_FEE
+        : deliveryMethod === "regular"
+        ? REGULAR_FEE
+        : deliveryMethod === "pickup"
+        ? 0
+        : 0;
+    return itemsTotal + shippingFee;
+  };
+
+  // Add helper function to calculate subtotal
+  const calculateSubtotal = () => {
     return cartItems.reduce(
       (sum, item) => sum + (item?.price || 0) * (item?.quantity || 0),
       0
@@ -189,12 +215,129 @@ const Checkout = () => {
               <div className="flex justify-between py-2">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-medium">
-                  ₦{calculateTotal().toFixed(2)}
+                  ₦{calculateSubtotal().toFixed(2)}
                 </span>
               </div>
+
+              {/* Delivery Options */}
+              <div className="py-2">
+                <p className="text-gray-600 mb-2">Delivery Method</p>
+                <div className="space-y-2">
+                  {/* Pickup Option */}
+                  <div
+                    className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                    onClick={() => setDeliveryMethod("pickup")}
+                  >
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        checked={deliveryMethod === "pickup"}
+                        onChange={() => {}}
+                        className="w-4 h-4 text-dun border-gray-300 rounded-full focus:ring-dun cursor-pointer"
+                      />
+                    </div>
+                    <div className="ml-2">
+                      <p className="font-medium">Pickup in Store</p>
+                      <p className="text-sm text-gray-500">
+                        Free - Collect from our store
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Standard Delivery */}
+                  <div
+                    className={`flex items-center p-3 border rounded-md ${
+                      calculateSubtotal() < STANDARD_MINIMUM
+                        ? "opacity-50"
+                        : "hover:border-dun cursor-pointer"
+                    }`}
+                    onClick={() =>
+                      calculateSubtotal() >= STANDARD_MINIMUM &&
+                      setDeliveryMethod("standard")
+                    }
+                  >
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        checked={deliveryMethod === "standard"}
+                        onChange={() => {}}
+                        disabled={calculateSubtotal() < STANDARD_MINIMUM}
+                        className="w-4 h-4 text-dun border-gray-300 rounded-full focus:ring-dun cursor-pointer"
+                      />
+                    </div>
+                    <div className="ml-2">
+                      <p className="font-medium">
+                        Standard Delivery (1-7 days)
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {calculateSubtotal() < STANDARD_MINIMUM
+                          ? `Minimum order of ₦${STANDARD_MINIMUM.toLocaleString()} required`
+                          : "Free Delivery Available"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Regular Delivery */}
+                  <div
+                    className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                    onClick={() =>
+                      setDeliveryMethod((prev) =>
+                        prev === "regular" ? "standard" : "regular"
+                      )
+                    }
+                  >
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        checked={deliveryMethod === "regular"}
+                        onChange={() => {}}
+                        className="w-4 h-4 text-dun border-gray-300 rounded-full focus:ring-dun cursor-pointer"
+                      />
+                    </div>
+                    <div className="ml-2">
+                      <p className="font-medium">Regular Delivery (1-7 days)</p>
+                      <p className="text-sm text-gray-500">₦1,000</p>
+                    </div>
+                  </div>
+
+                  {/* Express Delivery */}
+                  <div
+                    className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                    onClick={() =>
+                      setDeliveryMethod((prev) =>
+                        prev === "express" ? "standard" : "express"
+                      )
+                    }
+                  >
+                    <div className="relative flex items-center">
+                      <input
+                        type="radio"
+                        checked={deliveryMethod === "express"}
+                        onChange={() => {}}
+                        className="w-4 h-4 text-dun border-gray-300 rounded-full focus:ring-dun cursor-pointer"
+                      />
+                    </div>
+                    <div className="ml-2">
+                      <p className="font-medium">
+                        Express Delivery (24-48 hours)
+                      </p>
+                      <p className="text-sm text-gray-500">₦5,000</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-between py-2">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">₦0.00</span>
+                <span className="font-medium">
+                  ₦
+                  {(deliveryMethod === "express"
+                    ? EXPRESS_FEE
+                    : deliveryMethod === "regular"
+                    ? REGULAR_FEE
+                    : 0
+                  ).toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between py-2 text-lg font-bold">
                 <span>Total</span>
@@ -394,57 +537,74 @@ const Checkout = () => {
                 Payment Method
               </h2>
 
-              <div className="mb-6">
-                <div className="flex items-center mb-3">
-                  <input
-                    type="radio"
-                    id="creditCard"
-                    name="paymentMethod"
-                    value="card" // This will be mapped to CREDIT_CARD in backend
-                    checked={formData.paymentMethod === "card"}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-dun focus:ring-dun"
-                  />
-                  <label
-                    htmlFor="creditCard"
-                    className="ml-2 block text-sm font-medium text-gray-700"
-                  >
+              {/* Payment Method Section */}
+              <div className="mb-6 space-y-3">
+                <div
+                  className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, paymentMethod: "card" }))
+                  }
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="radio"
+                      id="creditCard"
+                      name="paymentMethod"
+                      value="card"
+                      checked={formData.paymentMethod === "card"}
+                      onChange={() => {}}
+                      className="appearance-none w-4 h-4 border border-gray-300 rounded-full checked:border-dun checked:border-8 transition-all duration-200 cursor-pointer"
+                    />
+                  </div>
+                  <label className="ml-2 cursor-pointer">
                     Credit/Debit Card
                   </label>
                 </div>
-                <div className="flex items-center mb-3">
-                  <input
-                    type="radio"
-                    id="paypal"
-                    name="paymentMethod"
-                    value="paypal"
-                    checked={formData.paymentMethod === "paypal"}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-dun focus:ring-dun"
-                  />
-                  <label
-                    htmlFor="paypal"
-                    className="ml-2 block text-sm font-medium text-gray-700"
-                  >
-                    PayPal
-                  </label>
+
+                <div
+                  className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      paymentMethod: "paypal",
+                    }))
+                  }
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="radio"
+                      id="paypal"
+                      name="paymentMethod"
+                      value="paypal"
+                      checked={formData.paymentMethod === "paypal"}
+                      onChange={() => {}}
+                      className="appearance-none w-4 h-4 border border-gray-300 rounded-full checked:border-dun checked:border-8 transition-all duration-200 cursor-pointer"
+                    />
+                  </div>
+                  <label className="ml-2 cursor-pointer">PayPal</label>
                 </div>
-                <div className="flex items-center">
-                  <input
-                    type="radio"
-                    id="bankTransfer"
-                    name="paymentMethod"
-                    value="bankTransfer"
-                    checked={formData.paymentMethod === "bankTransfer"}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-dun focus:ring-dun"
-                  />
-                  <label
-                    htmlFor="bankTransfer"
-                    className="ml-2 block text-sm font-medium text-gray-700"
-                  >
-                    Bank Transfer
-                  </label>
+
+                <div
+                  className="flex items-center p-3 border rounded-md hover:border-dun cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      paymentMethod: "bankTransfer",
+                    }))
+                  }
+                >
+                  <div className="relative flex items-center">
+                    <input
+                      type="radio"
+                      id="bankTransfer"
+                      name="paymentMethod"
+                      value="bankTransfer"
+                      checked={formData.paymentMethod === "bankTransfer"}
+                      onChange={() => {}}
+                      className="appearance-none w-4 h-4 border border-gray-300 rounded-full checked:border-dun checked:border-8 transition-all duration-200 cursor-pointer"
+                    />
+                  </div>
+                  <label className="ml-2 cursor-pointer">Bank Transfer</label>
                 </div>
               </div>
 
