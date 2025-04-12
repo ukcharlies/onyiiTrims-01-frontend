@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import ProductSlider from "../components/ProductSlider";
 import ProductGrid from "../components/ProductGrid";
 import TestimonialCarousel from "../components/TestimonialCarousel";
+import { toast } from "react-toastify";
+import emailjs from "@emailjs/browser";
 
 const Home = () => {
   const [hotBuyProducts, setHotBuyProducts] = useState([]);
@@ -14,6 +16,12 @@ const Home = () => {
     hotBuy: null,
     featured: null,
   });
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  useEffect(() => {
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+  }, []);
 
   useEffect(() => {
     const fetchHotBuyProducts = async () => {
@@ -65,6 +73,40 @@ const Home = () => {
     fetchHotBuyProducts();
     fetchFeaturedProducts();
   }, []);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubscribing(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/newsletter/subscribe",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to subscribe");
+      }
+
+      toast.success("Successfully subscribed to our newsletter!");
+      setEmail("");
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast.error(
+        error.message || "Failed to subscribe. Please try again later."
+      );
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <main>
@@ -342,18 +384,25 @@ const Home = () => {
               collections, special offers, and creative inspiration.
             </p>
 
-            <form className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto"
+            >
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email address"
                 className="flex-grow px-6 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-300"
                 required
+                disabled={isSubscribing}
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-white dark:bg-[#343E3D] text-dun dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
+                disabled={isSubscribing}
+                className="px-6 py-3 bg-white dark:bg-[#343E3D] text-dun dark:text-white font-medium rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Subscribe
+                {isSubscribing ? "Subscribing..." : "Subscribe"}
               </button>
             </form>
 

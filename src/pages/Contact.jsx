@@ -157,12 +157,12 @@ const Contact = () => {
                       General Inquiries:
                     </p>
                     <a
-                      href="mailto:info@onyitrims.com"
+                      href="mailto:onyiitrims@gmail.com"
                       className={`${
                         darkMode ? "text-[#607466]" : "text-dun"
                       } hover:underline`}
                     >
-                      info@onyitrims.com
+                      onyiitrims@gmail.com
                     </a>
                     <p
                       className={`${
@@ -435,10 +435,38 @@ const Contact = () => {
                 What are your shipping options?
               </h3>
               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-                We offer standard shipping (5-7 business days), express shipping
-                (2-3 business days), and next-day delivery options. Shipping
-                costs are calculated at checkout based on your location and
-                selected method.
+                We currently offer four delivery options within Nigeria:
+              </p>
+              <ul
+                className={`mt-2 list-disc pl-5 ${
+                  darkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                <li>
+                  <strong>Standard Delivery</strong> – Free for orders over
+                  ₦20,000. Delivery within 1–7 business days.
+                </li>
+                <li>
+                  <strong>Express Delivery</strong> – Arrives in 1–2 business
+                  days if your order is placed before 12 PM. Fast, reliable, and
+                  perfect for urgent needs.
+                </li>
+                <li>
+                  <strong>Regular Delivery</strong> – Costs ₦1,000 with an
+                  estimated delivery time of 1–7 business days.
+                </li>
+                <li>
+                  <strong>Store Pickup</strong> – Available the next day from
+                  our shop. It’s free and convenient if you’re nearby.
+                </li>
+              </ul>
+              <p
+                className={`mt-3 ${
+                  darkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                All orders are processed promptly, and you'll receive tracking
+                details once your order ships.
               </p>
             </div>
 
@@ -457,8 +485,7 @@ const Contact = () => {
               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                 Once your order ships, you'll receive a confirmation email with
                 tracking information. You can also view your order status by
-                logging into your account and visiting the order history
-                section.
+                logging into your account and visiting the Dashboard. section.
               </p>
             </div>
 
@@ -475,9 +502,11 @@ const Contact = () => {
                 What is your return policy?
               </h3>
               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-                We accept returns within 30 days of delivery for unused items in
-                their original packaging. Custom orders and sale items may have
-                different policies. Please contact us for specific details.
+                We accept returns within <strong>7 days</strong> of delivery for
+                unused items in their original packaging and condition. Custom
+                orders and sale items may be final sale and not eligible for
+                return. Please contact us with your order details to begin the
+                return process or for more specific information.
               </p>
             </div>
 
@@ -494,9 +523,19 @@ const Contact = () => {
                 Do you offer wholesale pricing?
               </h3>
               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-                Yes, we provide wholesale options for businesses and designers.
-                Please contact our sales team at wholesale@onyitrims.com for
-                pricing information and minimum order requirements.
+                Yes, we proudly offer wholesale pricing for tailors, designers,
+                fashion houses, and businesses looking to purchase in bulk. It's
+                a great way to save on supplies while ensuring consistent
+                quality. For pricing details, minimum order requirements, and
+                how to become a wholesale partner, please contact our sales team
+                at{" "}
+                <a
+                  href="mailto:onyiitrims@gmail.com"
+                  className="underline text-blue-500"
+                >
+                  onyiitrims@gmail.com
+                </a>
+                .
               </p>
             </div>
           </div>

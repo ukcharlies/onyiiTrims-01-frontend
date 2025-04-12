@@ -149,8 +149,11 @@ const Footer = () => {
             <div className="space-y-3">
               <p className="text-gray-600">
                 <strong>Email:</strong>{" "}
-                <a href="mailto:info@onyitrims.com" className="hover:text-dun">
-                  info@onyitrims.com
+                <a
+                  href="mailto:ionyiitrims@gmail.com"
+                  className="hover:text-dun"
+                >
+                  onyiitrims@gmail.com
                 </a>
               </p>
               <p className="text-gray-600">

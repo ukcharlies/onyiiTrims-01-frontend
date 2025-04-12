@@ -101,10 +101,10 @@ const Checkout = () => {
           country: formData.country,
         },
         paymentDetails: {
-          // Add this object
           method: formData.paymentMethod,
           transactionId: null, // This will be updated after payment
         },
+        deliveryMethod: deliveryMethod.toUpperCase(), // Add this
         items: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,

@@ -10,6 +10,36 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getDeliveryTimeText = (method) => {
+    switch (method) {
+      case "EXPRESS":
+        return "1-2 business days";
+      case "REGULAR":
+        return "3-5 business days";
+      case "STANDARD":
+        return "5-7 business days";
+      case "PICKUP":
+        return "Ready for pickup";
+      default:
+        return "5-7 business days";
+    }
+  };
+
+  const getBadgeColor = (method) => {
+    switch (method) {
+      case "EXPRESS":
+        return "bg-purple-100 text-purple-800";
+      case "REGULAR":
+        return "bg-orange-100 text-orange-800";
+      case "PICKUP":
+        return "bg-gray-100 text-gray-800";
+      case "STANDARD":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -101,9 +131,10 @@ const OrderDetail = () => {
             Placed on {new Date(order.date).toLocaleDateString()}
           </p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+          {/* Order Status Badge */}
           <span
-            className={`px-3 py-1 rounded text-sm font-medium ${
+            className={`px-3 py-1 rounded-full text-sm font-medium ${
               order.status === "DELIVERED"
                 ? "bg-green-100 text-green-800"
                 : order.status === "SHIPPED"
@@ -113,6 +144,21 @@ const OrderDetail = () => {
           >
             {order.status}
           </span>
+
+          {/* Delivery Method Badge */}
+          {order.deliveryMethod && (
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getBadgeColor(
+                order.deliveryMethod
+              )}`}
+            >
+              {order.deliveryMethod.charAt(0) +
+                order.deliveryMethod.slice(1).toLowerCase()}
+              <span className="ml-1">
+                ({getDeliveryTimeText(order.deliveryMethod)})
+              </span>
+            </span>
+          )}
         </div>
       </div>
 
@@ -121,18 +167,35 @@ const OrderDetail = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
           <p className="text-gray-700 whitespace-pre-line mb-2">
-            {order.shippingAddress.address}
+            {order.shippingAddress?.address || "No address provided"}
           </p>
           <p className="text-gray-600">
             Status:{" "}
-            <span className="font-medium">{order.shippingAddress.status}</span>
+            <span className="font-medium">
+              {order.shippingAddress?.status || "N/A"}
+            </span>
           </p>
-          {order.shippingAddress.estimatedDelivery && (
+          {order.shippingAddress?.estimatedDelivery && (
             <p className="text-gray-600 mt-2">
               Estimated Delivery:{" "}
-              {new Date(
-                order.shippingAddress.estimatedDelivery
-              ).toLocaleDateString()}
+              <span className="font-medium">
+                {new Date(
+                  order.shippingAddress.estimatedDelivery
+                ).toLocaleDateString()}
+                {order.deliveryMethod && (
+                  <span className="text-sm text-gray-500 ml-1">
+                    (
+                    {order.deliveryMethod === "EXPRESS"
+                      ? "1-2 business days"
+                      : order.deliveryMethod === "REGULAR"
+                      ? "3-5 business days"
+                      : order.deliveryMethod === "PICKUP"
+                      ? "Ready for pickup"
+                      : "5-7 business days"}
+                    )
+                  </span>
+                )}
+              </span>
             </p>
           )}
         </div>
@@ -147,12 +210,26 @@ const OrderDetail = () => {
         {/* Order Summary */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-          <p className="text-gray-700 mb-1">Items: {order.items.length}</p>
+          <p className="text-gray-700 mb-1">
+            Items: {order.items?.length || 0}
+          </p>
           <p className="text-gray-700 mb-1">
             Total Quantity:{" "}
-            {order.items.reduce((sum, item) => sum + item.quantity, 0)}
+            {order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
           </p>
-          <p className="text-gray-700 mb-1">Status: {order.status}</p>
+          <p className="text-gray-700 mb-1">Status: {order.status || "N/A"}</p>
+          {order.deliveryMethod && (
+            <p className="text-gray-700 mb-1">
+              Delivery Method:{" "}
+              {`${order.deliveryMethod.charAt(0)}${order.deliveryMethod
+                .slice(1)
+                .toLowerCase()}`}
+              {order.deliveryMethod === "STANDARD" && " (Free)"}
+              {order.deliveryMethod === "REGULAR" && " (₦1,000)"}
+              {order.deliveryMethod === "EXPRESS" && " (₦5,000)"}
+              {order.deliveryMethod === "PICKUP" && " (Free)"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -160,7 +237,7 @@ const OrderDetail = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">Order Items</h2>
         <div className="divide-y divide-gray-200">
-          {order.items.map((item) => (
+          {(order.items || []).map((item) => (
             <div key={item.id} className="py-4 flex items-center">
               <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
                 <img

@@ -34,6 +34,7 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [subscribers, setSubscribers] = useState([]);
 
   useEffect(() => {
     // Check if user is admin
@@ -88,6 +89,25 @@ const AdminDashboard = () => {
     };
     fetchSubcategories();
   }, [selectedCategory]);
+
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/newsletter/subscribers"
+        );
+        if (!response.ok) throw new Error("Failed to fetch subscribers");
+        const data = await response.json();
+        setSubscribers(data);
+      } catch (err) {
+        console.error("Error fetching subscribers:", err);
+      }
+    };
+
+    if (activeTab === "newsletter") {
+      fetchSubscribers();
+    }
+  }, [activeTab]);
 
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
@@ -217,6 +237,14 @@ const AdminDashboard = () => {
           >
             Manage Products
           </button>
+          <button
+            className={`px-4 py-2 rounded ${
+              activeTab === "newsletter" ? "bg-dun text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setActiveTab("newsletter")}
+          >
+            Newsletter
+          </button>
         </div>
       </div>
 
@@ -317,7 +345,7 @@ const AdminDashboard = () => {
             </table>
           </div>
         </div>
-      ) : (
+      ) : activeTab === "products" ? (
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Product Management</h2>
 
@@ -475,6 +503,46 @@ const AdminDashboard = () => {
             </table>
           </div>
         </div>
+      ) : (
+        activeTab === "newsletter" && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              Newsletter Subscribers
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-3 text-left">Email</th>
+                    <th className="p-3 text-left">Subscribed Date</th>
+                    <th className="p-3 text-left">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subscribers.map((subscriber) => (
+                    <tr key={subscriber.id} className="border-b">
+                      <td className="p-3">{subscriber.email}</td>
+                      <td className="p-3">
+                        {new Date(subscriber.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded ${
+                            subscriber.active
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {subscriber.active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
       )}
     </div>
   );
