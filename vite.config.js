@@ -11,6 +11,9 @@ export default defineConfig({
     port: 3000,
     host: "0.0.0.0",
   },
+  // Preview server configuration
+  // This is used when deploying to Vercel or similar platforms
+
   preview: {
     port: 3000,
   },
