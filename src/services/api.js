@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Add error handling wrapper
 const handleFetchError = async (response) => {
@@ -14,7 +14,7 @@ const handleFetchError = async (response) => {
   return response.json();
 };
 
-// Update fetchWithCredentials
+// Update fetchWithCredentials to handle CORS in production
 const fetchWithCredentials = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -22,6 +22,7 @@ const fetchWithCredentials = async (endpoint, options = {}) => {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        Origin: window.location.origin,
         ...options.headers,
       },
     });
