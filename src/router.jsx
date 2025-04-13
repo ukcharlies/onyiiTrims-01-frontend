@@ -177,3 +177,5 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+
+// Note: The `ProtectedRoute` and `CheckoutProtectedRoute` components should handle the logic for checking if the user is authenticated and redirecting to the login page if not. The `AdminDashboard` component should check if the user has admin privileges before rendering its content.
