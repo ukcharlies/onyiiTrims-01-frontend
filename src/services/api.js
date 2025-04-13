@@ -267,3 +267,13 @@ export const updateUser = async (userId, userData) => {
     body: JSON.stringify(userData),
   });
 };
+
+// Hot buy products fetch
+export const getHotBuyProducts = async () => {
+  return fetchWithCredentials("/api/products/hot-buy");
+};
+
+// Featured products fetch
+export const getFeaturedProducts = async () => {
+  return fetchWithCredentials("/api/products/featured");
+};
