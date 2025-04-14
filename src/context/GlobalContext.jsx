@@ -76,33 +76,47 @@ export const GlobalProvider = ({ children }) => {
       setLoading(true);
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // Important for cookies
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setUser(data);
+        setUser(data.user);
         setIsAuthenticated(true);
-        return {
-          success: true,
-          user: data,
-        };
+
+        // Return success and user data
+        const result = { success: true, user: data.user };
+
+        // Special handling for Safari to prevent redirection loops
+        if (
+          data.user.role === "ADMIN" &&
+          /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+        ) {
+          // Use a sync approach for Safari, wait briefly before redirecting
+          setTimeout(() => {
+            // Use window.location instead of react-router for consistent behavior
+            window.location.href = "/admin";
+          }, 300);
+          return result;
+        }
+
+        return result;
       } else {
         return {
           success: false,
-          message: data.message || "Login failed",
+          message: data.message || "Invalid email or password",
         };
       }
     } catch (error) {
       console.error("Login error:", error);
       return {
         success: false,
-        message: "An error occurred during login",
+        message: "An error occurred during login. Please try again.",
       };
     } finally {
       setLoading(false);

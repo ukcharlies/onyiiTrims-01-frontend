@@ -49,43 +49,44 @@ const Login = () => {
           toast.success("Login successful!");
         }
 
-        // Redirect based on intended destination or default to dashboard
-        const navigateTo = location.state?.from?.pathname || "/dashboard";
+        // Special handling for admin in Safari
+        if (
+          result.user &&
+          result.user.role === "ADMIN" &&
+          /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+        ) {
+          // Do nothing here as the redirect is handled in the login function
+          return;
+        }
+
+        // Regular redirection for other cases
+        const navigateTo =
+          location.state?.from?.pathname ||
+          (result.user?.role === "ADMIN" ? "/admin" : "/dashboard");
         navigate(navigateTo);
       } else {
-        // Trigger shake animation
+        // Existing error handling code
         setShakeForm(true);
-
-        // Show error toast in the center position
         toast.error(result.message || "Invalid email or password", {
           position: "top-center",
           autoClose: 3000,
         });
-
         setServerError(
           result.message || "Login failed. Please check your credentials."
         );
-
-        // Reset shake animation after 500ms
         setTimeout(() => {
           setShakeForm(false);
         }, 500);
       }
     } catch (err) {
+      // Existing error handling code
       console.error("Login error:", err);
-
-      // Trigger shake animation
       setShakeForm(true);
-
-      // Show error toast
       toast.error("An unexpected error occurred. Please try again.", {
         position: "top-center",
         autoClose: 3000,
       });
-
       setServerError("An unexpected error occurred. Please try again.");
-
-      // Reset shake animation after 500ms
       setTimeout(() => {
         setShakeForm(false);
       }, 500);
