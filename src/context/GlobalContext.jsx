@@ -73,7 +73,6 @@ export const GlobalProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      setLoading(true);
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         credentials: "include",
@@ -84,28 +83,25 @@ export const GlobalProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log("Login response:", data); // Debug logging
 
       if (response.ok) {
-        setUser(data.user);
+        // The backend returns user info directly, not in a data.user object
+        const userData = {
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          role: data.role || "CUSTOMER", // Provide fallback role
+        };
+
+        setUser(userData);
         setIsAuthenticated(true);
 
-        // Return success and user data
-        const result = { success: true, user: data.user };
-
-        // Special handling for Safari to prevent redirection loops
-        if (
-          data.user.role === "ADMIN" &&
-          /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-        ) {
-          // Use a sync approach for Safari, wait briefly before redirecting
-          setTimeout(() => {
-            // Use window.location instead of react-router for consistent behavior
-            window.location.href = "/admin";
-          }, 300);
-          return result;
-        }
-
-        return result;
+        return {
+          success: true,
+          user: userData,
+        };
       } else {
         return {
           success: false,
@@ -118,8 +114,6 @@ export const GlobalProvider = ({ children }) => {
         success: false,
         message: "An error occurred during login. Please try again.",
       };
-    } finally {
-      setLoading(false);
     }
   };
 
