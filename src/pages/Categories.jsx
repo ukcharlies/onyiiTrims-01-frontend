@@ -424,14 +424,17 @@ const Categories = () => {
 
               {/* Main Content - Products */}
               <div className="lg:col-span-3">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                  <div className="flex justify-between items-center mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+                  {" "}
+                  {/* Increased padding from p-6 to p-8 */}
+                  <div className="flex justify-between items-center mb-8">
+                    {" "}
+                    {/* Increased margin from mb-6 to mb-8 */}
                     <h2 className="text-2xl font-bold font-lora dark:text-white">
                       {activeSubcategory
                         ? `Products in ${activeSubcategory.name}`
                         : "All Products"}
                     </h2>
-
                     {activeSubcategory && (
                       <button
                         onClick={() => setActiveSubcategory(null)}
@@ -441,7 +444,6 @@ const Categories = () => {
                       </button>
                     )}
                   </div>
-
                   {loading.products ? (
                     <div className="flex justify-center py-8">
                       <Spinner />
@@ -474,14 +476,15 @@ const Categories = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 p-4">
                       {products.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          darkMode={darkMode}
-                          onAddToCart={() => handleAddToCart(product)}
-                        />
+                        <div key={product.id} className="flex justify-center">
+                          <ProductCard
+                            product={product}
+                            darkMode={darkMode}
+                            onAddToCart={() => handleAddToCart(product)}
+                          />
+                        </div>
                       ))}
                     </div>
                   )}
