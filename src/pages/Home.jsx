@@ -4,6 +4,7 @@ import ProductGrid from "../components/ProductGrid";
 import TestimonialCarousel from "../components/TestimonialCarousel";
 import { toast } from "react-toastify";
 import emailjs from "@emailjs/browser";
+import { getHotBuyProducts, getFeaturedProducts } from "../services/api";
 
 const Home = () => {
   const [hotBuyProducts, setHotBuyProducts] = useState([]);
@@ -26,13 +27,7 @@ const Home = () => {
   useEffect(() => {
     const fetchHotBuyProducts = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/products/hot-buy"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch hot buy products");
-        }
-        const data = await response.json();
+        const data = await getHotBuyProducts();
         setHotBuyProducts(data);
         setError((prev) => ({ ...prev, hotBuy: null }));
       } catch (error) {
@@ -49,13 +44,7 @@ const Home = () => {
 
     const fetchFeaturedProducts = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/products/featured"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch featured products");
-        }
-        const data = await response.json();
+        const data = await getFeaturedProducts();
         setFeaturedProducts(data);
         setError((prev) => ({ ...prev, featured: null }));
       } catch (error) {
@@ -80,7 +69,7 @@ const Home = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/newsletter/subscribe",
+        `${import.meta.env.VITE_API_URL}/api/newsletter/subscribe`,
         {
           method: "POST",
           headers: {
