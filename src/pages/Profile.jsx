@@ -55,7 +55,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl p-4 pt-12 md:pt-40">
+    <div className="container mx-auto max-w-7xl p-4 pt-20 md:pt-40">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-0">
           Profile

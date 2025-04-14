@@ -91,6 +91,7 @@ const ProductEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const formData = new FormData();
 
       // Add basic fields with proper type conversions
@@ -99,8 +100,13 @@ const ProductEdit = () => {
       formData.append("price", Number(product.price));
       formData.append("stock", parseInt(product.stock, 10));
       formData.append("subcategoryId", product.subcategoryId);
-      formData.append("isHotBuy", String(product.isHotBuy));
-      formData.append("isNewlyAdded", String(product.isNewlyAdded));
+
+      // Convert boolean values to strings "true" or "false"
+      formData.append("isHotBuy", product.isHotBuy ? "true" : "false");
+      formData.append("isNewlyAdded", product.isNewlyAdded ? "true" : "false");
+
+      console.log("Updating product with hot buy:", product.isHotBuy);
+      console.log("Updating product with newly added:", product.isNewlyAdded);
 
       // Handle existing images
       if (product.images?.length) {
@@ -115,9 +121,15 @@ const ProductEdit = () => {
       }
 
       await updateProduct(productId, formData);
+
+      // Show success message
+      alert("Product updated successfully!");
       navigate("/admin");
     } catch (err) {
+      console.error("Error updating product:", err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 

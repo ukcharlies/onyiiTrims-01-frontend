@@ -193,18 +193,30 @@ export const deleteProduct = async (productId) => {
 
 // Update product
 export const updateProduct = async (productId, productData) => {
-  const response = await fetch(`${API_URL}/api/products/${productId}`, {
-    method: "PUT",
-    credentials: "include",
-    body: productData, // FormData object for file upload
-  });
+  try {
+    // For debugging - log what we're sending to the server
+    console.log("Updating product with ID:", productId);
+    console.log("Form data entries:");
+    for (let pair of productData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to update product");
+    const response = await fetch(`${API_URL}/api/products/${productId}`, {
+      method: "PUT",
+      credentials: "include",
+      body: productData, // FormData object for file upload
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to update product");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Update product error:", error);
+    throw error;
   }
-
-  return response.json();
 };
 
 // Get user's orders
