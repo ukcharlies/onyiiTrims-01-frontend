@@ -124,7 +124,9 @@ const ProductEdit = () => {
 
       // Show success message
       alert("Product updated successfully!");
-      navigate("/admin");
+
+      // Navigate to home page to see updated product listings
+      navigate("/");
     } catch (err) {
       console.error("Error updating product:", err);
       setError(err.message);

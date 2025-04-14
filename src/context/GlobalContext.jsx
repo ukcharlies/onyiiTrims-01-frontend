@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 const GlobalContext = createContext();
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -256,6 +262,14 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  // Add a refresh timestamp to trigger updates across the app
+  const [refreshTimestamp, setRefreshTimestamp] = useState(Date.now());
+
+  // Function to trigger a refresh
+  const triggerRefresh = useCallback(() => {
+    setRefreshTimestamp(Date.now());
+  }, []);
+
   const contextValue = {
     user,
     isAuthenticated,
@@ -269,6 +283,8 @@ export const GlobalProvider = ({ children }) => {
     toggleDarkMode,
     requestPasswordReset,
     resetPassword,
+    refreshTimestamp,
+    triggerRefresh,
   };
 
   return (

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 import ProductSlider from "../components/ProductSlider";
 import ProductGrid from "../components/ProductGrid";
 import TestimonialCarousel from "../components/TestimonialCarousel";
@@ -7,15 +8,16 @@ import emailjs from "@emailjs/browser";
 import { getHotBuyProducts, getFeaturedProducts } from "../services/api";
 
 const Home = () => {
-  const [hotBuyProducts, setHotBuyProducts] = useState([]);
+  const location = useLocation();
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [hotBuyProducts, setHotBuyProducts] = useState([]);
   const [loading, setLoading] = useState({
-    hotBuy: true,
     featured: true,
+    hotBuy: true,
   });
   const [error, setError] = useState({
-    hotBuy: null,
     featured: null,
+    hotBuy: null,
   });
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -24,44 +26,50 @@ const Home = () => {
     emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
   }, []);
 
-  useEffect(() => {
-    const fetchHotBuyProducts = async () => {
-      try {
-        const data = await getHotBuyProducts();
-        setHotBuyProducts(data);
-        setError((prev) => ({ ...prev, hotBuy: null }));
-      } catch (error) {
-        console.error("Error fetching hot buy products:", error);
-        setError((prev) => ({
-          ...prev,
-          hotBuy: "Unable to load hot buy products. Please try again later.",
-        }));
-        setHotBuyProducts([]);
-      } finally {
-        setLoading((prev) => ({ ...prev, hotBuy: false }));
-      }
-    };
+  // Use useCallback to memoize the fetch function
+  const fetchProducts = useCallback(async () => {
+    // Reset any previous errors
+    setError({
+      featured: null,
+      hotBuy: null,
+    });
 
-    const fetchFeaturedProducts = async () => {
-      try {
-        const data = await getFeaturedProducts();
-        setFeaturedProducts(data);
-        setError((prev) => ({ ...prev, featured: null }));
-      } catch (error) {
-        console.error("Error fetching featured products:", error);
-        setError((prev) => ({
-          ...prev,
-          featured: "Unable to load featured products. Please try again later.",
-        }));
-        setFeaturedProducts([]);
-      } finally {
-        setLoading((prev) => ({ ...prev, featured: false }));
-      }
-    };
+    // Set loading states
+    setLoading({
+      featured: true,
+      hotBuy: true,
+    });
 
-    fetchHotBuyProducts();
-    fetchFeaturedProducts();
+    try {
+      // Fetch featured products
+      const featuredData = await getFeaturedProducts();
+      setFeaturedProducts(featuredData);
+      setLoading((prev) => ({ ...prev, featured: false }));
+    } catch (err) {
+      console.error("Error fetching featured products:", err);
+      setError((prev) => ({ ...prev, featured: err.message }));
+      setLoading((prev) => ({ ...prev, featured: false }));
+    }
+
+    try {
+      // Fetch hot buy products
+      const hotBuyData = await getHotBuyProducts();
+      setHotBuyProducts(hotBuyData);
+      setLoading((prev) => ({ ...prev, hotBuy: false }));
+    } catch (err) {
+      console.error("Error fetching hot buy products:", err);
+      setError((prev) => ({ ...prev, hotBuy: err.message }));
+      setLoading((prev) => ({ ...prev, hotBuy: false }));
+    }
   }, []);
+
+  useEffect(() => {
+    // Fetch products on initial load and when returning to the page
+    fetchProducts();
+
+    // The key insight: re-fetch whenever we return to this component
+    // This ensures that after product edits, the home page will show updated data
+  }, [fetchProducts, location.key]);
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();

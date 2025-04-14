@@ -45,6 +45,12 @@ const fetchWithCredentials = async (endpoint, options = {}) => {
   }
 };
 
+// Add a timestamp to prevent caching
+const addCacheBuster = (url) => {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_t=${new Date().getTime()}`;
+};
+
 // Search products
 export const searchProducts = async (query) => {
   try {
@@ -294,10 +300,12 @@ export const updateUser = async (userId, userData) => {
 
 // Hot buy products fetch
 export const getHotBuyProducts = async () => {
-  return fetchWithCredentials("/api/products/hot-buy");
+  const endpoint = addCacheBuster("/api/products/hot-buy");
+  return fetchWithCredentials(endpoint);
 };
 
 // Featured products fetch
 export const getFeaturedProducts = async () => {
-  return fetchWithCredentials("/api/products/featured");
+  const endpoint = addCacheBuster("/api/products/featured");
+  return fetchWithCredentials(endpoint);
 };
