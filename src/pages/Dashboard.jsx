@@ -13,12 +13,12 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Only redirect if user exists and is admin
     if (user?.role === "ADMIN") {
-      navigate("/admin"); // Redirect to AdminDashboard if user is admin
+      navigate("/admin", { replace: true });
+      return;
     }
-  }, [user, navigate]);
 
-  useEffect(() => {
     const fetchOrders = async () => {
       try {
         const userOrders = await getUserOrders();
@@ -31,8 +31,10 @@ const Dashboard = () => {
       }
     };
 
-    fetchOrders();
-  }, []);
+    if (!user?.role || user.role === "USER") {
+      fetchOrders();
+    }
+  }, [user, navigate]);
 
   // Function to open cart drawer
   const openCartDrawer = () => {

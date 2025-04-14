@@ -17,16 +17,27 @@ const handleFetchError = async (response) => {
 // Update fetchWithCredentials to handle CORS in production
 const fetchWithCredentials = async (endpoint, options = {}) => {
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
       ...options,
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Origin: window.location.origin,
+        Accept: "application/json",
         ...options.headers,
       },
     });
-    return handleFetchError(response);
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger a page reload to force re-authentication
+        window.location.href = "/login";
+        throw new Error("Authentication expired, please login again");
+      }
+      const error = await response.json();
+      throw new Error(error.message || "Request failed");
+    }
+
+    return await response.json();
   } catch (error) {
     console.error(`API Error (${endpoint}):`, error);
     throw error;

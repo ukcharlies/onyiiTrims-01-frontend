@@ -1,11 +1,10 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, useLocation, Outlet } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, loading } = useGlobal();
+  const { isAuthenticated, loading, user } = useGlobal();
   const location = useLocation();
 
-  // Show loading indicator while checking authentication
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -14,12 +13,21 @@ const ProtectedRoute = () => {
     );
   }
 
-  // Redirect to login if not authenticated, saving the current location
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location, message: "Please login to continue." }}
+        replace
+      />
+    );
   }
 
-  // Render child routes if authenticated
+  // For admin routes, check if user has admin role
+  if (location.pathname.startsWith("/admin") && user?.role !== "ADMIN") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return <Outlet />;
 };
 

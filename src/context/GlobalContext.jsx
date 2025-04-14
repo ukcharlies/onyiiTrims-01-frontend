@@ -37,14 +37,15 @@ export const GlobalProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Check for authentication using cookies
     const checkAuth = async () => {
       try {
-        // Since we're using HttpOnly cookies, we just need to call the verify endpoint
-        // The cookie will be sent automatically with the request
         const response = await fetch(`${API_URL}/api/users/verify`, {
           method: "GET",
-          credentials: "include", // Important for sending cookies
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
@@ -54,11 +55,14 @@ export const GlobalProvider = ({ children }) => {
         } else {
           setIsAuthenticated(false);
           setUser(null);
+          // Clear any stale data
+          await logout();
         }
       } catch (error) {
         console.error("Authentication error:", error);
         setIsAuthenticated(false);
         setUser(null);
+        await logout();
       } finally {
         setLoading(false);
       }
@@ -166,17 +170,22 @@ export const GlobalProvider = ({ children }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        credentials: "include", // Important for cookies
+        credentials: "include",
         body: JSON.stringify(userData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setUser({ ...user, ...data.user });
-        return { success: true };
+        setUser((prevUser) => ({ ...prevUser, ...data.user }));
+        return { success: true, user: data.user };
       } else {
+        // If we get a 401, trigger a re-authentication
+        if (response.status === 401) {
+          await checkAuth();
+        }
         return {
           success: false,
           message: data.message || "Failed to update profile",
