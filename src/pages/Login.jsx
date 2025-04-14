@@ -42,30 +42,43 @@ const Login = () => {
       setLoading(true);
       const result = await login(data.email, data.password);
 
+      // First, check if the result exists at all
+      if (!result) {
+        throw new Error("No response from login server");
+      }
+
       if (result.success) {
-        if (result.user && result.user.firstName) {
-          toast.success(`Welcome back, ${result.user.firstName}!`);
-        } else {
-          toast.success("Login successful!");
-        }
+        // User successfully authenticated
+        toast.success(
+          result.user?.firstName
+            ? `Welcome back, ${result.user.firstName}!`
+            : "Login successful!"
+        );
 
         // Special handling for admin in Safari
-        if (
-          result.user &&
-          result.user.role === "ADMIN" &&
-          /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-        ) {
+        const isSafari = /^((?!chrome|android).)*safari/i.test(
+          navigator.userAgent
+        );
+        const isAdmin = result.user?.role === "ADMIN";
+
+        if (isAdmin && isSafari) {
           // Do nothing here as the redirect is handled in the login function
           return;
         }
 
-        // Regular redirection for other cases
-        const navigateTo =
-          location.state?.from?.pathname ||
-          (result.user?.role === "ADMIN" ? "/admin" : "/dashboard");
-        navigate(navigateTo);
+        // Determine where to navigate
+        let redirectPath;
+        if (location.state?.from?.pathname) {
+          redirectPath = location.state.from.pathname;
+        } else if (isAdmin) {
+          redirectPath = "/admin";
+        } else {
+          redirectPath = "/dashboard";
+        }
+
+        navigate(redirectPath);
       } else {
-        // Existing error handling code
+        // Handle failed login
         setShakeForm(true);
         toast.error(result.message || "Invalid email or password", {
           position: "top-center",
