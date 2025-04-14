@@ -42,11 +42,6 @@ const Login = () => {
       setLoading(true);
       const result = await login(data.email, data.password);
 
-      // First, check if the result exists at all
-      if (!result) {
-        throw new Error("No response from login server");
-      }
-
       if (result.success) {
         // User successfully authenticated
         toast.success(
@@ -55,26 +50,30 @@ const Login = () => {
             : "Login successful!"
         );
 
-        // Special handling for admin in Safari
+        // Check if it's Safari browser (for admin users only)
         const isSafari = /^((?!chrome|android).)*safari/i.test(
           navigator.userAgent
         );
         const isAdmin = result.user?.role === "ADMIN";
 
-        if (isAdmin && isSafari) {
-          // Do nothing here as the redirect is handled in the login function
-          return;
+        if (isAdmin) {
+          // Set a longer session marker for admins
+          localStorage.setItem("adminSessionStart", Date.now().toString());
+
+          if (isSafari) {
+            toast.info("Preparing admin dashboard...");
+
+            // For Safari, use a slight delay to ensure cookies are properly set
+            setTimeout(() => {
+              navigate("/admin");
+            }, 800);
+            return;
+          }
         }
 
-        // Determine where to navigate
-        let redirectPath;
-        if (location.state?.from?.pathname) {
-          redirectPath = location.state.from.pathname;
-        } else if (isAdmin) {
-          redirectPath = "/admin";
-        } else {
-          redirectPath = "/dashboard";
-        }
+        // For non-Safari or non-admin users, navigate immediately
+        const redirectPath =
+          location.state?.from?.pathname || (isAdmin ? "/admin" : "/dashboard");
 
         navigate(redirectPath);
       } else {

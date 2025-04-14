@@ -77,32 +77,43 @@ export const GlobalProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Only modify the login function, keep everything else as is
   const login = async (email, password) => {
     try {
+      console.log("Attempting login for:", email);
+
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
+          // Safari needs this to properly handle cookies
+          "Cache-Control": "no-cache",
         },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-      console.log("Login response:", data); // Debug logging
+      console.log("Login response:", data);
 
       if (response.ok) {
-        // The backend returns user info directly, not in a data.user object
         const userData = {
           id: data.id,
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
-          role: data.role || "CUSTOMER", // Provide fallback role
+          role: data.role || "CUSTOMER",
         };
 
+        // Store in state
         setUser(userData);
         setIsAuthenticated(true);
+
+        // Cache role in localStorage as a backup
+        if (userData.role === "ADMIN") {
+          localStorage.setItem("adminSession", "true");
+        }
 
         return {
           success: true,
