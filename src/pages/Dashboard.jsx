@@ -144,18 +144,24 @@ const Dashboard = () => {
               <p className="mb-2 text-gray-600 dark:text-gray-300">
                 Total Orders: {orders.length}
               </p>
-              <p className="mb-4 text-gray-600 dark:text-gray-300">
-                Last Order:{" "}
-                {orders.length > 0
-                  ? new Date(orders[0].createdAt).toLocaleDateString()
-                  : "No orders yet"}
-              </p>
-              <Link
-                to="/orders"
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-              >
-                View All Orders
-              </Link>
+              {orders.length > 0 ? (
+                <>
+                  <p className="mb-4 text-gray-600 dark:text-gray-300">
+                    Last Order:{" "}
+                    {new Date(orders[0].createdAt).toLocaleDateString()}
+                  </p>
+                  <Link
+                    to="/orders"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  >
+                    View All Orders
+                  </Link>
+                </>
+              ) : (
+                <p className="text-gray-600 dark:text-gray-300">
+                  You haven't placed any orders yet.
+                </p>
+              )}
             </>
           )}
         </div>
@@ -174,7 +180,10 @@ const Dashboard = () => {
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : orders.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-300">No orders found</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              You have no orders yet. Start shopping to see your order history
+              here.
+            </p>
           ) : (
             <table className="w-full">
               <thead>
