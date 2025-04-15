@@ -40,6 +40,13 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+
+      // Detect Safari browser
+      const isSafari = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      );
+      console.log("Logging in with Safari:", isSafari);
+
       const result = await login(data.email, data.password);
 
       if (result.success) {
@@ -50,32 +57,42 @@ const Login = () => {
             : "Login successful!"
         );
 
-        // Check if it's Safari browser (for admin users only)
-        const isSafari = /^((?!chrome|android).)*safari/i.test(
-          navigator.userAgent
-        );
         const isAdmin = result.user?.role === "ADMIN";
 
         if (isAdmin) {
-          // Set a longer session marker for admins
-          localStorage.setItem("adminSessionStart", Date.now().toString());
+          // Safari needs longer delay to ensure cookies are properly set
+          const redirectDelay = isSafari ? 1200 : 300;
 
+          toast.info(
+            `Preparing admin dashboard${
+              isSafari ? " (Safari compatibility mode)" : ""
+            }...`,
+            { autoClose: redirectDelay }
+          );
+
+          // Store admin info in localStorage for Safari fallback
           if (isSafari) {
-            toast.info("Preparing admin dashboard...");
-
-            // For Safari, use a slight delay to ensure cookies are properly set
-            setTimeout(() => {
-              navigate("/admin");
-            }, 800);
-            return;
+            localStorage.setItem("safariAdminAuth", "true");
           }
+
+          setTimeout(() => {
+            navigate("/admin", { replace: true });
+          }, redirectDelay);
+
+          return;
         }
 
-        // For non-Safari or non-admin users, navigate immediately
-        const redirectPath =
-          location.state?.from?.pathname || (isAdmin ? "/admin" : "/dashboard");
+        // For non-admin users, navigate to the appropriate page
+        // Add slight delay for Safari
+        const redirectPath = location.state?.from?.pathname || "/dashboard";
 
-        navigate(redirectPath);
+        if (isSafari) {
+          setTimeout(() => {
+            navigate(redirectPath, { replace: true });
+          }, 500);
+        } else {
+          navigate(redirectPath, { replace: true });
+        }
       } else {
         // Handle failed login
         setShakeForm(true);

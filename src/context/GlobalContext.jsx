@@ -82,20 +82,33 @@ export const GlobalProvider = ({ children }) => {
     try {
       console.log("Attempting login for:", email);
 
+      // Detect Safari browser
+      const isSafari = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      );
+      console.log("Browser detected as Safari:", isSafari);
+
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          // Safari needs this to properly handle cookies
-          "Cache-Control": "no-cache",
+          // Safari specific headers
+          ...(isSafari && {
+            "Cache-Control": "no-cache",
+            "X-Safari-Browser": "true",
+          }),
         },
         body: JSON.stringify({ email, password }),
       });
 
+      // Log response information for debugging
+      console.log("Login response status:", response.status);
+      console.log("Login response headers:", [...response.headers.entries()]);
+
       const data = await response.json();
-      console.log("Login response:", data);
+      console.log("Login response data:", data);
 
       if (response.ok) {
         const userData = {
@@ -110,9 +123,16 @@ export const GlobalProvider = ({ children }) => {
         setUser(userData);
         setIsAuthenticated(true);
 
-        // Cache role in localStorage as a backup
+        // For Safari, always use localStorage as a fallback
+        localStorage.setItem("userRole", userData.role);
+        localStorage.setItem("userEmail", userData.email);
+        localStorage.setItem("userName", userData.firstName);
+        localStorage.setItem("userId", userData.id);
+        localStorage.setItem("loginTimestamp", Date.now().toString());
+
         if (userData.role === "ADMIN") {
           localStorage.setItem("adminSession", "true");
+          localStorage.setItem("adminSessionStart", Date.now().toString());
         }
 
         return {
