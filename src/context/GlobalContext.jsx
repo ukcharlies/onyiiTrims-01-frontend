@@ -80,6 +80,7 @@ export const GlobalProvider = ({ children }) => {
   // Only modify the login function, keep everything else as is
   const login = async (email, password) => {
     try {
+      setLoading(true);
       console.log("Attempting login for:", email);
 
       // Detect Safari browser
@@ -92,9 +93,6 @@ export const GlobalProvider = ({ children }) => {
         "Content-Type": "application/json",
         Accept: "application/json",
       };
-
-      // Don't add Safari-specific headers that might cause CORS issues
-      // Safari will handle cookies correctly without these
 
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
@@ -123,14 +121,19 @@ export const GlobalProvider = ({ children }) => {
         setUser(userData);
         setIsAuthenticated(true);
 
-        // For Safari, always use localStorage as a fallback
-        localStorage.setItem("userRole", userData.role);
-        localStorage.setItem("userEmail", userData.email);
-        localStorage.setItem("userName", userData.firstName);
-        localStorage.setItem("userId", userData.id);
-        localStorage.setItem("loginTimestamp", Date.now().toString());
+        // For Safari, always store token in localStorage for API calls
+        if (isSafari) {
+          localStorage.setItem("authToken", data.token);
+          localStorage.setItem("userRole", userData.role);
+          localStorage.setItem("userEmail", userData.email);
+          localStorage.setItem("userName", userData.firstName);
+          localStorage.setItem("userId", userData.id);
+          localStorage.setItem("loginTimestamp", Date.now().toString());
+        }
 
+        // Special handling for admin
         if (userData.role === "ADMIN") {
+          localStorage.setItem("adminToken", data.token);
           localStorage.setItem("adminSession", "true");
           localStorage.setItem("adminSessionStart", Date.now().toString());
         }
@@ -159,6 +162,8 @@ export const GlobalProvider = ({ children }) => {
         success: false,
         message: errorMessage,
       };
+    } finally {
+      setLoading(false);
     }
   };
 

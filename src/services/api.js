@@ -51,6 +51,33 @@ const addCacheBuster = (url) => {
   return `${url}${separator}_t=${new Date().getTime()}`;
 };
 
+// Helper function to get auth headers
+const getAuthHeaders = () => {
+  const headers = {};
+
+  // Detect Safari
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  // For Safari, use token from localStorage
+  if (isSafari) {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      headers["x-auth-token"] = token;
+    }
+
+    // For admin routes, add special admin token
+    if (localStorage.getItem("adminSession") === "true") {
+      const adminToken = localStorage.getItem("adminToken");
+      if (adminToken) {
+        headers["x-admin-token"] = adminToken;
+      }
+    }
+  }
+
+  return headers;
+};
+
 // Search products
 export const searchProducts = async (query) => {
   try {
@@ -243,7 +270,17 @@ export const getOrderDetails = async (orderId) => {
 
 // Admin: Get all orders
 export const getAllOrders = async () => {
-  return fetchWithCredentials("/api/orders/admin");
+  try {
+    const response = await fetch(`${API_URL}/api/orders/admin`, {
+      credentials: "include",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to fetch orders");
+    return await response.json();
+  } catch (error) {
+    console.error("Get all orders error:", error);
+    throw error;
+  }
 };
 
 // Admin: Update order status
@@ -280,7 +317,17 @@ export const confirmPayment = async (paymentData) => {
 
 // Admin: Get all users
 export const getAllUsers = async () => {
-  return fetchWithCredentials("/api/users");
+  try {
+    const response = await fetch(`${API_URL}/api/users`, {
+      credentials: "include",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to fetch users");
+    return await response.json();
+  } catch (error) {
+    console.error("Get all users error:", error);
+    throw error;
+  }
 };
 
 // Admin: Delete user

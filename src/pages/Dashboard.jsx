@@ -18,15 +18,24 @@ const Dashboard = () => {
 
     // Only redirect if user exists and is admin
     if (user?.role === "ADMIN") {
-      // For Safari, add a small delay to ensure authentication is properly established
+      // For Safari, ensure auth headers are prepared
       if (isSafari) {
-        const timer = setTimeout(() => {
-          navigate("/admin", { replace: true });
-        }, 900);
-        return () => clearTimeout(timer);
+        // Ensure admin token is available for API requests
+        const adminToken = localStorage.getItem("adminToken");
+        if (adminToken) {
+          console.log(
+            "Admin token available for Safari: preparing admin access"
+          );
+
+          // Wait slightly longer to ensure token is properly stored
+          const timer = setTimeout(() => {
+            navigate("/admin", { replace: true });
+          }, 1200);
+
+          return () => clearTimeout(timer);
+        }
       } else {
         navigate("/admin", { replace: true });
-        return;
       }
     }
 
