@@ -236,4 +236,3 @@ const Login = () => {
 };
 
 export default Login;
-// remeber safarihas high security and it will not allow cookies to be set if the user is not on the same domain
