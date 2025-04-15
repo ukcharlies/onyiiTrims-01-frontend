@@ -88,18 +88,18 @@ export const GlobalProvider = ({ children }) => {
       );
       console.log("Browser detected as Safari:", isSafari);
 
+      const headers = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+
+      // Don't add Safari-specific headers that might cause CORS issues
+      // Safari will handle cookies correctly without these
+
       const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          // Safari specific headers
-          ...(isSafari && {
-            "Cache-Control": "no-cache",
-            "X-Safari-Browser": "true",
-          }),
-        },
+        headers: headers,
         body: JSON.stringify({ email, password }),
       });
 
@@ -147,9 +147,17 @@ export const GlobalProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Login error:", error);
+
+      // Provide more specific error message for Safari users
+      const errorMessage = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      )
+        ? "Login failed due to Safari compatibility issues. Please try using a different browser or check if third-party cookies are enabled."
+        : "An error occurred during login. Please try again.";
+
       return {
         success: false,
-        message: "An error occurred during login. Please try again.",
+        message: errorMessage,
       };
     }
   };
