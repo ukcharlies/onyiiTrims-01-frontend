@@ -13,10 +13,21 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Check if we're in Safari
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
     // Only redirect if user exists and is admin
     if (user?.role === "ADMIN") {
-      navigate("/admin", { replace: true });
-      return;
+      // For Safari, add a small delay to ensure authentication is properly established
+      if (isSafari) {
+        const timer = setTimeout(() => {
+          navigate("/admin", { replace: true });
+        }, 900);
+        return () => clearTimeout(timer);
+      } else {
+        navigate("/admin", { replace: true });
+        return;
+      }
     }
 
     const fetchOrders = async () => {
@@ -31,7 +42,7 @@ const Dashboard = () => {
       }
     };
 
-    if (!user?.role || user.role === "USER") {
+    if (!user?.role || user.role === "USER" || user.role === "CUSTOMER") {
       fetchOrders();
     }
   }, [user, navigate]);
