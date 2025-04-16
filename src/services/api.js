@@ -37,9 +37,10 @@ const getAuthHeaders = () => {
       }
     }
 
-    // Add user role for additional context
+    // Only add user role header if it exists in localStorage
+    // This is causing problems in Safari, so let's be more careful
     const userRole = localStorage.getItem("userRole");
-    if (userRole) {
+    if (userRole && userRole.trim() !== "") {
       headers["x-user-role"] = userRole;
     }
   }
@@ -47,23 +48,38 @@ const getAuthHeaders = () => {
   return headers;
 };
 
-// Enhanced fetchWithCredentials function for better error handling
+// Enhanced fetchWithCredentials function with better Safari support
 const fetchWithCredentials = async (endpoint, options = {}) => {
   try {
     const url = endpoint.startsWith("http")
       ? endpoint
       : `${API_URL}${endpoint}`;
 
-    // Prepare headers with auth tokens
-    const baseHeaders = {
-      "Content-Type": "application/json",
-      ...getAuthHeaders(),
-    };
+    // Special handling for public endpoints
+    const isPublicEndpoint =
+      endpoint.includes("/api/products/featured") ||
+      endpoint.includes("/api/products/hot-buy");
 
-    const finalHeaders = {
-      ...baseHeaders,
-      ...(options.headers || {}),
-    };
+    // Prepare headers - for public endpoints we'll use minimal headers to avoid CORS issues
+    let finalHeaders = {};
+
+    if (isPublicEndpoint) {
+      // For public endpoints, use minimal headers
+      finalHeaders = {
+        Accept: "application/json",
+      };
+    } else {
+      // For protected endpoints, use full auth headers
+      const baseHeaders = {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      };
+
+      finalHeaders = {
+        ...baseHeaders,
+        ...(options.headers || {}),
+      };
+    }
 
     const response = await fetch(url, {
       ...options,
