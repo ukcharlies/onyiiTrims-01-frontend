@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import { useCart } from "../context/CartContext";
 import { getUserOrders } from "../services/api";
 
 const Dashboard = () => {
   const { user } = useGlobal();
-  const navigate = useNavigate(); // Add navigate
+  const navigate = useNavigate();
   const { cartItems, getCartTotal } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,21 @@ const Dashboard = () => {
         }
       } else {
         navigate("/admin", { replace: true });
+      }
+    }
+
+    // For regular users in Safari, verify session
+    if (isSafari && user) {
+      // Ensure auth token is properly set
+      const authToken = localStorage.getItem("authToken");
+      if (!authToken && user.id) {
+        console.log("Safari user session needs reinforcement");
+        localStorage.setItem(
+          "authToken",
+          localStorage.getItem("adminToken") || ""
+        );
+        localStorage.setItem("userRole", user.role);
+        localStorage.setItem("userId", user.id);
       }
     }
 

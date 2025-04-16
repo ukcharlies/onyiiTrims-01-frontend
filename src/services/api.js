@@ -14,43 +14,6 @@ const handleFetchError = async (response) => {
   return response.json();
 };
 
-// Update fetchWithCredentials to handle CORS in production
-const fetchWithCredentials = async (endpoint, options = {}) => {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ...options.headers,
-      },
-      mode: "cors", // Explicitly set CORS mode
-    });
-
-    // Check for CORS errors specifically
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Trigger a page reload to force re-authentication
-        window.location.href = "/login";
-        throw new Error("Authentication expired, please login again");
-      }
-      return handleFetchError(response);
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error(`API Error (${endpoint}):`, error);
-    throw error;
-  }
-};
-
-// Add a timestamp to prevent caching
-const addCacheBuster = (url) => {
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}_t=${new Date().getTime()}`;
-};
-
 // Helper function to get auth headers
 const getAuthHeaders = () => {
   const headers = {};
@@ -73,9 +36,60 @@ const getAuthHeaders = () => {
         headers["x-admin-token"] = adminToken;
       }
     }
+
+    // Add user role for additional context
+    const userRole = localStorage.getItem("userRole");
+    if (userRole) {
+      headers["x-user-role"] = userRole;
+    }
   }
 
   return headers;
+};
+
+// Enhanced fetchWithCredentials function for better error handling
+const fetchWithCredentials = async (endpoint, options = {}) => {
+  try {
+    const url = endpoint.startsWith("http")
+      ? endpoint
+      : `${API_URL}${endpoint}`;
+
+    // Prepare headers with auth tokens
+    const baseHeaders = {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    };
+
+    const finalHeaders = {
+      ...baseHeaders,
+      ...(options.headers || {}),
+    };
+
+    const response = await fetch(url, {
+      ...options,
+      headers: finalHeaders,
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      // Handle 401 unauthorized errors more gracefully
+      if (response.status === 401) {
+        console.error("Authentication failed for request:", endpoint);
+      }
+      return handleFetchError(response);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`API Error (${endpoint}):`, error);
+    throw error;
+  }
+};
+
+// Add a timestamp to prevent caching
+const addCacheBuster = (url) => {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_t=${new Date().getTime()}`;
 };
 
 // Search products

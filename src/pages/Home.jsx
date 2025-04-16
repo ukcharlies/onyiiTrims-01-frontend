@@ -130,7 +130,9 @@ const Home = () => {
               <p className="font-lora text-xl md:text-2xl mb-8 tracking-wide">
                 Discover our exclusive collection
               </p>
-              <button className="btn-fill">Shop Now</button>
+              <Link to="/shop" className="btn-fill">
+                Shop Now
+              </Link>
             </div>
           </div>
         </div>
