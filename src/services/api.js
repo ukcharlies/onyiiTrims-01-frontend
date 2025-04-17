@@ -14,90 +14,92 @@ const handleFetchError = async (response) => {
   return response.json();
 };
 
-// Helper function to get auth headers
+// Enhanced getAuthHeaders function with better Chrome support while preserving Safari handling
 const getAuthHeaders = () => {
-  const headers = {};
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
 
-  // Detect Safari
+  // Detect browser
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  // For Safari, use token from localStorage
   if (isSafari) {
+    // Keep original Safari implementation
     const token = localStorage.getItem("authToken");
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
       headers["x-auth-token"] = token;
     }
 
-    // For admin routes, add special admin token
+    // For admin routes in Safari, add special admin token
     if (localStorage.getItem("adminSession") === "true") {
       const adminToken = localStorage.getItem("adminToken");
       if (adminToken) {
         headers["x-admin-token"] = adminToken;
       }
     }
+  } else {
+    // Chrome-specific implementation
+    // Try to get token from cookies first (this works better in Chrome)
+    let token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)jwt\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
 
-    // Only add user role header if it exists in localStorage
-    // This is causing problems in Safari, so let's be more careful
-    const userRole = localStorage.getItem("userRole");
-    if (userRole && userRole.trim() !== "") {
-      headers["x-user-role"] = userRole;
+    // Fallback to localStorage if cookie not found
+    if (!token) {
+      token = localStorage.getItem("authToken");
     }
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      headers["x-auth-token"] = token;
+    }
+  }
+
+  // Add user role header if available (for both browsers)
+  const userRole = localStorage.getItem("userRole");
+  if (userRole && userRole.trim() !== "") {
+    headers["x-user-role"] = userRole;
   }
 
   return headers;
 };
 
-// Enhanced fetchWithCredentials function with better Safari support
+// Use the existing fetchWithCredentials function but ensure it passes credentials for Chrome
 const fetchWithCredentials = async (endpoint, options = {}) => {
   try {
     const url = endpoint.startsWith("http")
       ? endpoint
       : `${API_URL}${endpoint}`;
 
-    // Special handling for public endpoints
-    const isPublicEndpoint =
-      endpoint.includes("/api/products/featured") ||
-      endpoint.includes("/api/products/hot-buy");
+    // Detect browser
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    // Prepare headers - for public endpoints we'll use minimal headers to avoid CORS issues
-    let finalHeaders = {};
-
-    if (isPublicEndpoint) {
-      // For public endpoints, use minimal headers
-      finalHeaders = {
-        Accept: "application/json",
-      };
+    // Prepare headers differently for each browser
+    let headers;
+    if (isSafari) {
+      // Keep original Safari implementation
+      headers = options.headers || getAuthHeaders();
     } else {
-      // For protected endpoints, use full auth headers
-      const baseHeaders = {
-        "Content-Type": "application/json",
+      // For Chrome, merge auth headers with existing headers
+      headers = {
         ...getAuthHeaders(),
-      };
-
-      finalHeaders = {
-        ...baseHeaders,
         ...(options.headers || {}),
       };
     }
 
-    const response = await fetch(url, {
+    const config = {
       ...options,
-      headers: finalHeaders,
       credentials: "include",
-    });
+      headers,
+    };
 
-    if (!response.ok) {
-      // Handle 401 unauthorized errors more gracefully
-      if (response.status === 401) {
-        console.error("Authentication failed for request:", endpoint);
-      }
-      return handleFetchError(response);
-    }
-
-    return response.json();
+    const response = await fetch(url, config);
+    return handleFetchError(response);
   } catch (error) {
-    console.error(`API Error (${endpoint}):`, error);
+    console.error(`API error for ${endpoint}:`, error);
     throw error;
   }
 };
@@ -288,28 +290,17 @@ export const getUserOrders = async () => {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-      // Original implementation for Safari
+      // Keep original Safari implementation
       return fetchWithCredentials("/api/orders/my-orders");
     } else {
-      // Direct fetch for Chrome
-      console.log("Using direct fetch for Chrome");
+      // Chrome-specific approach
       const response = await fetch(`${API_URL}/api/orders/my-orders`, {
         method: "GET",
         credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
       });
 
-      if (!response.ok) {
-        console.error("Orders API error status:", response.status);
-        const text = await response.text();
-        console.error("Orders API error body:", text);
-        throw new Error(text || "Failed to fetch orders");
-      }
-
-      return await response.json();
+      return handleFetchError(response);
     }
   } catch (error) {
     console.error("Get user orders error:", error);
@@ -358,41 +349,21 @@ export const createOrder = async (orderData) => {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-      // Use original implementation for Safari
+      // Keep original Safari implementation
       return fetchWithCredentials("/api/orders", {
         method: "POST",
         body: JSON.stringify(orderData),
       });
     } else {
       // Chrome-specific approach
-      console.log("Using direct fetch for Chrome order creation");
       const response = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(orderData),
       });
 
-      if (!response.ok) {
-        console.error("Order creation error status:", response.status);
-        const errorText = await response.text();
-        console.error("Order creation error body:", errorText);
-
-        let errorMessage;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.message || "Failed to create order";
-        } catch {
-          errorMessage = errorText || "Failed to create order";
-        }
-
-        throw new Error(errorMessage);
-      }
-
-      return await response.json();
+      return handleFetchError(response);
     }
   } catch (error) {
     console.error("Order creation error:", error);
