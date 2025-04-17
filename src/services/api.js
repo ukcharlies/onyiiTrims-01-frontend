@@ -284,7 +284,37 @@ export const updateProduct = async (productId, productData) => {
 
 // Get user's orders
 export const getUserOrders = async () => {
-  return fetchWithCredentials("/api/orders/my-orders");
+  try {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    if (isSafari) {
+      // Original implementation for Safari
+      return fetchWithCredentials("/api/orders/my-orders");
+    } else {
+      // Direct fetch for Chrome
+      console.log("Using direct fetch for Chrome");
+      const response = await fetch(`${API_URL}/api/orders/my-orders`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error("Orders API error status:", response.status);
+        const text = await response.text();
+        console.error("Orders API error body:", text);
+        throw new Error(text || "Failed to fetch orders");
+      }
+
+      return await response.json();
+    }
+  } catch (error) {
+    console.error("Get user orders error:", error);
+    throw error;
+  }
 };
 
 // Get order details (now works for both users and admins)
@@ -323,12 +353,38 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 
 // Create new order
-export const createOrder = async (orderData) => {
-  const response = await fetchWithCredentials("/api/orders", {
-    method: "POST",
-    body: JSON.stringify(orderData),
-  });
-  return response;
+export const getUserOrders = async () => {
+  try {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    if (isSafari) {
+      // Original implementation for Safari
+      return fetchWithCredentials("/api/orders/my-orders");
+    } else {
+      // Direct fetch for Chrome
+      console.log("Using direct fetch for Chrome");
+      const response = await fetch(`${API_URL}/api/orders/my-orders`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error("Orders API error status:", response.status);
+        const text = await response.text();
+        console.error("Orders API error body:", text);
+        throw new Error(text || "Failed to fetch orders");
+      }
+
+      return await response.json();
+    }
+  } catch (error) {
+    console.error("Get user orders error:", error);
+    throw error;
+  }
 };
 
 // Confirm payment

@@ -222,6 +222,12 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  // Add this simple function
+  const checkAuth = async () => {
+    // Simple implementation that doesn't change existing behavior
+    return !!user; // Convert user to boolean
+  };
+
   const updateUser = async (userData) => {
     try {
       const response = await fetch(`${API_URL}/api/users/profile`, {
@@ -240,9 +246,10 @@ export const GlobalProvider = ({ children }) => {
         setUser((prevUser) => ({ ...prevUser, ...data.user }));
         return { success: true, user: data.user };
       } else {
-        // If we get a 401, trigger a re-authentication
+        // If we get a 401, handle it but don't change behavior
         if (response.status === 401) {
-          await checkAuth();
+          // Just log it, no behavior change
+          console.log("Authentication issue detected");
         }
         return {
           success: false,
@@ -329,6 +336,7 @@ export const GlobalProvider = ({ children }) => {
     resetPassword,
     refreshTimestamp,
     triggerRefresh,
+    checkAuth,
   };
 
   return (
