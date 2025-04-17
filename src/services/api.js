@@ -353,36 +353,49 @@ export const updateOrderStatus = async (orderId, status) => {
 };
 
 // Create new order
-export const getUserOrders = async () => {
+export const createOrder = async (orderData) => {
   try {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-      // Original implementation for Safari
-      return fetchWithCredentials("/api/orders/my-orders");
+      // Use original implementation for Safari
+      return fetchWithCredentials("/api/orders", {
+        method: "POST",
+        body: JSON.stringify(orderData),
+      });
     } else {
-      // Direct fetch for Chrome
-      console.log("Using direct fetch for Chrome");
-      const response = await fetch(`${API_URL}/api/orders/my-orders`, {
-        method: "GET",
+      // Chrome-specific approach
+      console.log("Using direct fetch for Chrome order creation");
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: "POST",
         credentials: "include",
         headers: {
-          Accept: "application/json",
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
-        console.error("Orders API error status:", response.status);
-        const text = await response.text();
-        console.error("Orders API error body:", text);
-        throw new Error(text || "Failed to fetch orders");
+        console.error("Order creation error status:", response.status);
+        const errorText = await response.text();
+        console.error("Order creation error body:", errorText);
+
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || "Failed to create order";
+        } catch {
+          errorMessage = errorText || "Failed to create order";
+        }
+
+        throw new Error(errorMessage);
       }
 
       return await response.json();
     }
   } catch (error) {
-    console.error("Get user orders error:", error);
+    console.error("Order creation error:", error);
     throw error;
   }
 };
