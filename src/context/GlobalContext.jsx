@@ -345,3 +345,4 @@ export const GlobalProvider = ({ children }) => {
     </GlobalContext.Provider>
   );
 };
+//commits code and pushes to the repository
