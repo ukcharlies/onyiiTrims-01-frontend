@@ -14,7 +14,7 @@ const handleFetchError = async (response) => {
   return response.json();
 };
 
-// Enhanced getAuthHeaders function with better Chrome support while preserving Safari handling
+// Enhanced getAuthHeaders function with universal browser support
 const getAuthHeaders = () => {
   const headers = {
     "Content-Type": "application/json",
@@ -24,41 +24,36 @@ const getAuthHeaders = () => {
   // Detect browser
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  if (isSafari) {
-    // Keep original Safari implementation
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-      headers["x-auth-token"] = token;
-    }
+  // Universal token retrieval approach
+  let token = null;
 
-    // For admin routes in Safari, add special admin token
-    if (localStorage.getItem("adminSession") === "true") {
-      const adminToken = localStorage.getItem("adminToken");
-      if (adminToken) {
-        headers["x-admin-token"] = adminToken;
-      }
-    }
-  } else {
-    // Chrome-specific implementation
-    // Try to get token from cookies first (this works better in Chrome)
-    let token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)jwt\s*=\s*([^;]*).*$)|^.*$/,
+  // 1. Try localStorage first (works in all browsers)
+  token = localStorage.getItem("authToken");
+
+  // 2. If no token in localStorage but user is in session, sync tokens
+  if (!token && localStorage.getItem("userEmail")) {
+    // Force token synchronization from cookies if possible
+    token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
       "$1"
     );
+    if (token) localStorage.setItem("authToken", token);
+  }
 
-    // Fallback to localStorage if cookie not found
-    if (!token) {
-      token = localStorage.getItem("authToken");
-    }
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+    headers["x-auth-token"] = token;
+  }
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-      headers["x-auth-token"] = token;
+  // For admin routes, add special admin token
+  if (localStorage.getItem("adminSession") === "true") {
+    const adminToken = localStorage.getItem("adminToken");
+    if (adminToken) {
+      headers["x-admin-token"] = adminToken;
     }
   }
 
-  // Add user role header if available (for both browsers)
+  // Add user role header if available
   const userRole = localStorage.getItem("userRole");
   if (userRole && userRole.trim() !== "") {
     headers["x-user-role"] = userRole;
@@ -67,27 +62,22 @@ const getAuthHeaders = () => {
   return headers;
 };
 
-// Use the existing fetchWithCredentials function but ensure it passes credentials for Chrome
+// Improved fetchWithCredentials with consistent behavior across browsers
 const fetchWithCredentials = async (endpoint, options = {}) => {
   try {
     const url = endpoint.startsWith("http")
       ? endpoint
       : `${API_URL}${endpoint}`;
 
-    // Detect browser
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // Handle headers consistently across browsers
+    const headers = {
+      ...getAuthHeaders(),
+      ...(options.headers || {}),
+    };
 
-    // Prepare headers differently for each browser
-    let headers;
-    if (isSafari) {
-      // Keep original Safari implementation
-      headers = options.headers || getAuthHeaders();
-    } else {
-      // For Chrome, merge auth headers with existing headers
-      headers = {
-        ...getAuthHeaders(),
-        ...(options.headers || {}),
-      };
+    // If this is a form data request, don't set Content-Type
+    if (options.body instanceof FormData) {
+      delete headers["Content-Type"];
     }
 
     const config = {
@@ -95,6 +85,14 @@ const fetchWithCredentials = async (endpoint, options = {}) => {
       credentials: "include",
       headers,
     };
+
+    // Debug for auth requests
+    if (endpoint.includes("profile") || endpoint.includes("orders")) {
+      console.log(`Request to ${endpoint}:`, {
+        headers: headers,
+        hasToken: !!headers["Authorization"],
+      });
+    }
 
     const response = await fetch(url, config);
     return handleFetchError(response);
@@ -284,24 +282,11 @@ export const updateProduct = async (productId, productData) => {
   }
 };
 
-// Get user's orders
+// Get user's orders - unified approach for all browsers
 export const getUserOrders = async () => {
   try {
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-    if (isSafari) {
-      // Keep original Safari implementation
-      return fetchWithCredentials("/api/orders/my-orders");
-    } else {
-      // Chrome-specific approach
-      const response = await fetch(`${API_URL}/api/orders/my-orders`, {
-        method: "GET",
-        credentials: "include",
-        headers: getAuthHeaders(),
-      });
-
-      return handleFetchError(response);
-    }
+    console.log("Getting user orders with auth headers:", getAuthHeaders());
+    return fetchWithCredentials("/api/orders/my-orders");
   } catch (error) {
     console.error("Get user orders error:", error);
     throw error;
@@ -343,28 +328,14 @@ export const updateOrderStatus = async (orderId, status) => {
   return response;
 };
 
-// Create new order
+// Create new order - unified approach for all browsers
 export const createOrder = async (orderData) => {
   try {
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-    if (isSafari) {
-      // Keep original Safari implementation
-      return fetchWithCredentials("/api/orders", {
-        method: "POST",
-        body: JSON.stringify(orderData),
-      });
-    } else {
-      // Chrome-specific approach
-      const response = await fetch(`${API_URL}/api/orders`, {
-        method: "POST",
-        credentials: "include",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(orderData),
-      });
-
-      return handleFetchError(response);
-    }
+    console.log("Creating order with auth headers:", getAuthHeaders());
+    return fetchWithCredentials("/api/orders", {
+      method: "POST",
+      body: JSON.stringify(orderData),
+    });
   } catch (error) {
     console.error("Order creation error:", error);
     throw error;

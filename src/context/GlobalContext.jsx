@@ -77,7 +77,7 @@ export const GlobalProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Only modify the login function, keep everything else as is
+  // Improved login function with universal token handling
   const login = async (email, password) => {
     try {
       setLoading(true);
@@ -121,15 +121,13 @@ export const GlobalProvider = ({ children }) => {
         setUser(userData);
         setIsAuthenticated(true);
 
-        // For Safari, always store token in localStorage for API calls
-        if (isSafari) {
-          localStorage.setItem("authToken", data.token);
-          localStorage.setItem("userRole", userData.role);
-          localStorage.setItem("userEmail", userData.email);
-          localStorage.setItem("userName", userData.firstName);
-          localStorage.setItem("userId", userData.id);
-          localStorage.setItem("loginTimestamp", Date.now().toString());
-        }
+        // Store token in localStorage for all browsers
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userRole", userData.role);
+        localStorage.setItem("userEmail", userData.email);
+        localStorage.setItem("userName", userData.firstName);
+        localStorage.setItem("userId", userData.id);
+        localStorage.setItem("loginTimestamp", Date.now().toString());
 
         // Special handling for admin
         if (userData.role === "ADMIN") {
@@ -222,11 +220,51 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
-  // Add this simple function
-  const checkAuth = async () => {
-    // Simple implementation that doesn't change existing behavior
-    return !!user; // Convert user to boolean
-  };
+  // Add a more robust checkAuth function
+  const checkAuth = useCallback(async () => {
+    try {
+      // First check if we have a token in localStorage
+      const storedToken = localStorage.getItem("authToken");
+
+      if (storedToken) {
+        // Try to verify the token with the backend
+        const response = await fetch(`${API_URL}/api/users/verify`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "x-auth-token": storedToken,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Update user if needed
+          if (!user || user.id !== data.user.id) {
+            setUser(data.user);
+            setIsAuthenticated(true);
+          }
+
+          return true;
+        }
+      }
+
+      // If no token in localStorage or token is invalid,
+      // clear state to force re-login
+      if (isAuthenticated) {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Auth verification error:", error);
+      return false;
+    }
+  }, [API_URL, user, isAuthenticated]);
 
   const updateUser = async (userData) => {
     try {

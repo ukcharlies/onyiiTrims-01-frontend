@@ -54,7 +54,29 @@ const Dashboard = () => {
       }
     }
 
-    const fetchOrders = async () => {
+    // Ensure authentication is properly set before fetching orders
+    const prepareAndFetchOrders = async () => {
+      if (!user) return;
+
+      // Make sure token is available
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        // If we have user data but no token, store critical info in localStorage
+        localStorage.setItem("userRole", user.role || "CUSTOMER");
+        localStorage.setItem("userId", user.id);
+        localStorage.setItem("userEmail", user.email);
+
+        // Try to extract token from cookie
+        const cookieToken = document.cookie.replace(
+          /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+          "$1"
+        );
+        if (cookieToken) {
+          localStorage.setItem("authToken", cookieToken);
+        }
+      }
+
+      // Now fetch orders
       try {
         const userOrders = await getUserOrders();
         setOrders(userOrders);
@@ -67,7 +89,7 @@ const Dashboard = () => {
     };
 
     if (!user?.role || user.role === "USER" || user.role === "CUSTOMER") {
-      fetchOrders();
+      prepareAndFetchOrders();
     }
   }, [user, navigate]);
 

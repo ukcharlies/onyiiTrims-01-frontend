@@ -78,10 +78,27 @@ const Checkout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
+    // Ensure authentication is properly set
+    if (user && !localStorage.getItem("authToken")) {
+      localStorage.setItem("userRole", user.role || "CUSTOMER");
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("userEmail", user.email);
+
+      // Try to extract token from cookie
+      const cookieToken = document.cookie.replace(
+        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
+      );
+      if (cookieToken) {
+        localStorage.setItem("authToken", cookieToken);
+        console.log("Token synchronized from cookie before order creation");
+      }
+    }
+
+    try {
       // Update user profile with new address and phone
       await updateUser({
         phoneNumber: formData.phoneNumber,
@@ -112,6 +129,7 @@ const Checkout = () => {
         })),
       };
 
+      console.log("Creating order with data:", orderData);
       const response = await createOrder(orderData);
       setOrder(response.order); // Store the entire order object
       setOrderNumber(response.order.orderNumber);
